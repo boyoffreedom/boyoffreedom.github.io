@@ -2,30 +2,30 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Posts on 立羽博客</title>
-    <link>https://github.com/boyoffreedom/boyoffreedom.github.io/post/</link>
+    <link>boyoffreedom.github.io/post/</link>
     <description>Recent content in Posts on 立羽博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sun, 12 Nov 2017 22:26:04 +0800</lastBuildDate>
     
-	<atom:link href="https://github.com/boyoffreedom/boyoffreedom.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="boyoffreedom.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Matlab_Serial_Scope</title>
-      <link>https://github.com/boyoffreedom/boyoffreedom.github.io/post/matlab_serial_scope/</link>
+      <link>boyoffreedom.github.io/post/matlab_serial_scope/</link>
       <pubDate>Sun, 12 Nov 2017 22:26:04 +0800</pubDate>
       
-      <guid>https://github.com/boyoffreedom/boyoffreedom.github.io/post/matlab_serial_scope/</guid>
+      <guid>boyoffreedom.github.io/post/matlab_serial_scope/</guid>
       <description>MATLAB是一个在全球范围内都非常行销的仿真工具。本文主要介绍如何灵活的使用MATLAB构建一个上位机示波器。 </description>
     </item>
     
     <item>
       <title>About</title>
-      <link>https://github.com/boyoffreedom/boyoffreedom.github.io/post/about/</link>
+      <link>boyoffreedom.github.io/post/about/</link>
       <pubDate>Sun, 12 Nov 2017 22:20:43 +0800</pubDate>
       
-      <guid>https://github.com/boyoffreedom/boyoffreedom.github.io/post/about/</guid>
+      <guid>boyoffreedom.github.io/post/about/</guid>
       <description>这是Undefined Alan的第一个blog！恭喜恭喜</description>
     </item>
     
