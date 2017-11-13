@@ -56,7 +56,7 @@ background-size:cover;
 div.transbox			/*透明属性*/
 {
 background-color: #101010;
-border: 1px solid black;
+border: 2px solid black;
 opacity:0.6;
 filter:alpha(opacity=60); /* For IE8 and earlier */
 }
@@ -64,7 +64,7 @@ div.transbox p			/*透明属性的段落属性定义*/
 {
 font-family:仿宋;
 font-size:20px;
-text-indent:30px;
+text-indent:40px;
 padding: 5px 30px;
 font-weight:bold;
 color: #b0b0b0;
@@ -78,6 +78,15 @@ font-weight:bold;
 color: #b0b0b0;
 line-height:30px;
 }
+
+
+.read-more-link
+{
+	text-decoration:none;
+  font-family:隶书;
+}
+.read-more-link:hover{font-weight:bold;}
+.read-more-link:active{font-weight:bold;}
 
 /*
  * Sidebar
@@ -132,12 +141,14 @@ line-height:30px;
   font-family: "华文隶书";
   list-style: none;
 }
+.sidebar-nav:hover{font-weight:bold;color:#c0c0c0;}
+.sidebar-nav:active{font-weight:bold;color:#c0c0c0;}
+
 .sidebar-nav-item {
   display: block;
 }
 a.sidebar-nav-item:hover,
 a.sidebar-nav-item:focus {
-  text-decoration: underline;
   color:gray;
 }
 .sidebar-nav-item.active {
