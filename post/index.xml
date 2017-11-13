@@ -2,30 +2,30 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Posts on 立羽博客</title>
-    <link>http://boyoffreedom.github.io/post/</link>
+    <link>https://boyoffreedom.github.io/post/</link>
     <description>Recent content in Posts on 立羽博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sun, 12 Nov 2017 22:26:04 +0800</lastBuildDate>
     
-	<atom:link href="http://boyoffreedom.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://boyoffreedom.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Matlab_Serial_Scope</title>
-      <link>http://boyoffreedom.github.io/post/matlab_serial_scope/</link>
+      <link>https://boyoffreedom.github.io/post/matlab_serial_scope/</link>
       <pubDate>Sun, 12 Nov 2017 22:26:04 +0800</pubDate>
       
-      <guid>http://boyoffreedom.github.io/post/matlab_serial_scope/</guid>
+      <guid>https://boyoffreedom.github.io/post/matlab_serial_scope/</guid>
       <description>MATLAB是一个在全球范围内都非常行销的仿真工具。本文主要介绍如何灵活的使用MATLAB构建一个上位机示波器。</description>
     </item>
     
     <item>
       <title>博客简介</title>
-      <link>http://boyoffreedom.github.io/post/about/</link>
+      <link>https://boyoffreedom.github.io/post/about/</link>
       <pubDate>Sun, 12 Nov 2017 22:20:43 +0800</pubDate>
       
-      <guid>http://boyoffreedom.github.io/post/about/</guid>
+      <guid>https://boyoffreedom.github.io/post/about/</guid>
       <description>我是Undefined Alan，是一名攻读电路与系统专业的硕士学生。这是我第一次开通博客，我会在上面分享一些我研究的东西，希望能帮到大家。
 我目前涉及的方向有MATLAB、C语言、Python语言、HDL语言以及神经网络相关的理论，由于开博客之前我还有很多代码积累，因此这段时间会抽空将博客外观美化下，之后会慢慢更新我以前的代码。
 也希望大家如果在我的代码中发现了什么问题，及时联系我，由于本人第一次在github上搭建博客，暂时还没有开启评论功能，因此希望大家通过QQ或Email联系我。
