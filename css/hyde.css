@@ -55,6 +55,7 @@ background-size:cover;
 
 div.transbox			/*透明属性*/
 {
+min-height: 40rem;
 background-color: #101010;
 border: 2px solid black;
 opacity:0.6;
@@ -141,8 +142,13 @@ line-height:30px;
   font-family: "华文隶书";
   list-style: none;
 }
-.sidebar-nav:hover{font-weight:bold;color:#c0c0c0;}
-.sidebar-nav:active{font-weight:bold;color:#c0c0c0;}
+
+.text_link
+{
+  text-decoration:none;
+}
+.text_link:hover{font-weight:bold;}
+.text_link:active{font-weight:bold;}
 
 .sidebar-nav-item {
   display: block;

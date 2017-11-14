@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Pythons on 立羽博客</title>
+    <link>https://boyoffreedom.github.io/python/</link>
+    <description>Recent content in Pythons on 立羽博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 14 Nov 2017 12:34:27 +0800</lastBuildDate>
+    
+	<atom:link href="https://boyoffreedom.github.io/python/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>[原创]基于pygame的打字练习游戏</title>
+      <link>https://boyoffreedom.github.io/python/typegame/</link>
+      <pubDate>Tue, 14 Nov 2017 12:34:27 +0800</pubDate>
+      
+      <guid>https://boyoffreedom.github.io/python/typegame/</guid>
+      <description>&lt;p&gt;基于pygame的打字练习游戏&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

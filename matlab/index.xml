@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>MATLABs on 立羽博客</title>
+    <link>https://boyoffreedom.github.io/matlab/</link>
+    <description>Recent content in MATLABs on 立羽博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 12 Nov 2017 22:26:04 +0800</lastBuildDate>
+    
+	<atom:link href="https://boyoffreedom.github.io/matlab/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>[原创]Matlab上位机示波器</title>
+      <link>https://boyoffreedom.github.io/matlab/matlab-scop/</link>
+      <pubDate>Sun, 12 Nov 2017 22:26:04 +0800</pubDate>
+      
+      <guid>https://boyoffreedom.github.io/matlab/matlab-scop/</guid>
+      <description>&lt;p&gt;MATLAB是一个在全球范围内都非常行销的仿真工具。本文主要介绍如何灵活的使用MATLAB构建一个上位机示波器。&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>
