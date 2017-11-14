@@ -351,7 +351,10 @@ tbody tr:nth-child(odd) th {
 .related-posts li a:hover small {
   color: inherit;
 }
+div.Comments{
+  max-width: 20rem;
 
+}
 
 /*
  * Pagination
