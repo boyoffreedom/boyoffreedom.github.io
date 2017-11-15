@@ -6,10 +6,19 @@
     <description>Recent content in MATLABs on 立羽博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 12 Nov 2017 22:26:04 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 15 Nov 2017 01:28:51 +0800</lastBuildDate>
     
 	<atom:link href="https://boyoffreedom.github.io/matlab/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>[原创]Matlab上位机示波器(中)</title>
+      <link>https://boyoffreedom.github.io/matlab/matlab-scop2/</link>
+      <pubDate>Wed, 15 Nov 2017 01:28:51 +0800</pubDate>
+      
+      <guid>https://boyoffreedom.github.io/matlab/matlab-scop2/</guid>
+      <description>&lt;p&gt;在上一篇博文我们谈到了怎么使用MATLAB的plot与subplot函数进行多个图形的同窗口显示，我们的示波器最基本的图形界面框架就可以使用figure、plot与subplot函数构成，因为追求使用，最大限度的放弃了GUI编程，而这几个函数也很完美的满足了我们整个系统的需求。对于plot函数其实还可以在同一个窗口的同一张图片上绘制不同的曲线，只需要将n个m长度的行向量叠加成一个nxm的矩阵，plot函数将自动将你的矩阵内的每行向量穿上不同颜色的衣服再给推向屏幕。这不是本章重点，还请大家自己在MATLAB的命令行或脚本内自行编写调试。在这一章中主要给大家介绍一下怎么使用MATLAB调用串口资源。&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>[原创]Matlab上位机示波器(上)</title>
@@ -17,7 +26,7 @@
       <pubDate>Sun, 12 Nov 2017 22:26:04 +0800</pubDate>
       
       <guid>https://boyoffreedom.github.io/matlab/matlab-scop1/</guid>
-      <description>&lt;p&gt;MATLAB是一个在全球范围内都非常行销的仿真工具，熟练使用MATLAB，能大大降低你在一些仿真研究中花费的时间，也能提高你的研究效率。本篇博文将手把手教你如何通过MATLAB编写一个上位机示波器。&lt;/p&gt;</description>
+      <description>&lt;p&gt;MATLAB是一个在全球范围内都非常行销的仿真工具，熟练使用MATLAB，能大大降低你在一些仿真研究中花费的时间，也能提高你的研究效率。本篇博文将手把手教你如何通过MATLAB编写一个上位机示波器。不知道示波器是什么的同学还请自行百度，墙外的同学请google，谢谢！&lt;/p&gt;</description>
     </item>
     
   </channel>

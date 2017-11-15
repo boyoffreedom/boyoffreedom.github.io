@@ -38,7 +38,7 @@ body
 {
 background-repeat:no-repeat;
 background-attachment:fixed;
-background-image: url("https://raw.githubusercontent.com/boyoffreedom/boyoffreedom.github.io/master/background/bg1.jpg");
+background-image: url("http://wx1.sinaimg.cn/large/a876926ely1fliyppnjokj21hc0u0tcr.jpg");
 background-size:cover;
 }
 
@@ -58,8 +58,8 @@ div.transbox			/*透明属性*/
 min-height: 40rem;
 background-color: #101010;
 border: 2px solid black;
-opacity:0.6;
-filter:alpha(opacity=60); /* For IE8 and earlier */
+opacity:0.8;
+filter:alpha(opacity=80); /* For IE8 and earlier */
 }
 div.transbox p			/*透明属性的段落属性定义*/
 {
