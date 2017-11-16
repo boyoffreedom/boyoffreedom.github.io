@@ -6,10 +6,19 @@
     <description>Recent content in MATLABs on 立羽博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 15 Nov 2017 01:28:51 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 15 Nov 2017 23:00:59 +0800</lastBuildDate>
     
 	<atom:link href="https://boyoffreedom.github.io/matlab/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>[原创]Matlab上位机示波器(下)</title>
+      <link>https://boyoffreedom.github.io/matlab/matlab-scop3/</link>
+      <pubDate>Wed, 15 Nov 2017 23:00:59 +0800</pubDate>
+      
+      <guid>https://boyoffreedom.github.io/matlab/matlab-scop3/</guid>
+      <description>&lt;p&gt;博客刚建立，确实很忙也很累啊！花了5天时间从连github page是什么都不知道，到最终建成了自己的博客页面，这段时间每天晚上2-3点钟才睡，调试博客页面，希望给我的博客增加一些新的功能，虽然采用第三方建站工具hugo生成html，自己也改了大部分html和css文件。页面大致建成之后又开始疯狂写博文来努力丰富博客的内容，也是希望我的博客能受大家的欢迎，能给大家解决实际问题，同时分享我的一些想法。到今天，我博客的第一个原创系列正式收工！是不是可以开个香槟庆祝一下。嗯，我希望能将这个博客一直运行下去，只要github没有被墙，我就会一直给大家带来更新，就算github被WALL了，我也愿意花钱买个服务器，自己做下去，希望我能一直坚持下去！一边学习，一边分享，希望得到大家的支持！好了，言归正传，我们今天就来攻坚串口示波器的最后一个部分——回调函数。&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>[原创]Matlab上位机示波器(中)</title>

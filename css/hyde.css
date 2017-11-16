@@ -55,11 +55,14 @@ background-size:cover;
 
 div.transbox			/*透明属性*/
 {
+padding-top: 2rem;
+padding-left: 2rem;
+padding-right: 2rem;
 min-height: 40rem;
 background-color: #101010;
 border: 2px solid black;
-opacity:0.8;
-filter:alpha(opacity=80); /* For IE8 and earlier */
+opacity:0.718;
+filter:alpha(opacity=71.8); /* For IE8 and earlier */
 }
 div.transbox p			/*透明属性的段落属性定义*/
 {
@@ -69,7 +72,7 @@ text-indent:40px;
 padding: 5px 30px;
 font-weight:bold;
 color: #b0b0b0;
-line-height:30px;
+line-height:35px;
 }
 
 div.transbox h1			/*透明属性的段落属性定义*/
@@ -149,6 +152,13 @@ line-height:30px;
 }
 .text_link:hover{font-weight:bold;}
 .text_link:active{font-weight:bold;}
+
+a.text_link
+{
+  text-decoration:none;
+}
+a.text_link:hover{font-weight:bold;}
+a.text_link:active{font-weight:bold;}
 
 .sidebar-nav-item {
   display: block;

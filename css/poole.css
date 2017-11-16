@@ -176,6 +176,8 @@ pre code {
   background-color: transparent;
 }
 .highlight {
+  padding-left: 4rem;
+  padding-right: 4rem;
   margin-bottom: 1rem;
   border-radius: 4px;
 }
@@ -351,9 +353,9 @@ tbody tr:nth-child(odd) th {
 .related-posts li a:hover small {
   color: inherit;
 }
-div.Comments{
-  max-width: 20rem;
-
++
+.list{
+  padding-top: 5rem;
 }
 
 /*
