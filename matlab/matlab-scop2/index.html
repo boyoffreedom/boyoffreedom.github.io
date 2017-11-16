@@ -50,8 +50,13 @@
   <span class="post-date">Wed, Nov 15, 2017</span>
   <p>在上一篇博文我们谈到了怎么使用MATLAB的plot与subplot函数进行多个图形的同窗口显示，我们的示波器最基本的图形界面框架就可以使用figure、plot与subplot函数构成，因为追求使用，最大限度的放弃了GUI编程，而这几个函数也很完美的满足了我们整个系统的需求。对于plot函数其实还可以在同一个窗口的同一张图片上绘制不同的曲线，只需要将n个m长度的行向量叠加成一个nxm的矩阵，plot函数将自动将你的矩阵内的每行向量穿上不同颜色的衣服再给推向屏幕。这不是本章重点，还请大家自己在MATLAB的命令行或脚本内自行编写调试。在这一章中主要给大家介绍一下怎么使用MATLAB调用串口资源。</p>
 
-<p>串口是上位机与下位机之间最简单的通信方式，几乎每款单片机都有自己单独的串口模块，通过单片机内部的控制寄存配置就可以无忧的调用串口与上位机进行数据交互。相应的，在我们使用的个人PC上，操作系统已经将我们可能会用到的串口资源打包成了函数，我们可以通过调用这些函数对PC的串口进行数据读写，串口调试助手是每个串口开发者必备的第一个工具，建议大家在调试下位机的时候，先选择串口调试助手查看底层数据，查看数据帧格式是否正确，校验是否正确，数据数值是否正确（下位机输出固定数值或周期数值进行检测），再将MATLAB与串口进行对接，这样也能提高你的工程开发效率，不用再从底层去查找BUG。对于MATLAB串口，我们需要了解的东西很简单，MATLAB的串口采用回调函数的形式进行数据处理，大致分为三种方式，一种是根据帧结束字如&rdquo;\n&rdquo;，当串口每次接收到0x0d即&rdquo;\n&rdquo;的ASCII码时，调用一次回调函数；一种是时间中断处理，每隔固定的时间调用一次回调函数；还有一种是字节计数，例如设定字节计数为100，当MATLAB接收到100个串口数据字节（按标准串口通信，一个数据为8bit，实际通信位数为10bit，包括一位开始位，一位停止位）时，触发MATLAB串口回调函数。在本例中，我们使用字节计数模式，设置下位机定时发送数据，触发回调函数。让我们先来看看有哪些参数可以配置。
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-m" data-lang="m">BaudRate：波特率 
+<p>串口是上位机与下位机之间最简单的通信方式，几乎每款单片机都有自己单独的串口模块，通过单片机内部的控制寄存配置就可以无忧的调用串口与上位机进行数据交互。相应的，在我们使用的个人PC上，操作系统已经将我们可能会用到的串口资源打包成了函数，我们可以通过调用这些函数对PC的串口进行数据读写，串口调试助手是每个串口开发者必备的第一个工具，建议大家在调试下位机的时候，先选择串口调试助手查看底层数据，查看数据帧格式是否正确，校验是否正确，数据数值是否正确（下位机输出固定数值或周期数值进行检测），再将MATLAB与串口进行对接，这样也能提高你的工程开发效率，不用再从底层去查找BUG。对于MATLAB串口，我们需要了解的东西很简单，MATLAB的串口采用回调函数的形式进行数据处理，大致分为三种方式，一种是根据帧结束字如&rdquo;\n&rdquo;，当串口每次接收到0x0d即&rdquo;\n&rdquo;的ASCII码时，调用一次回调函数；一种是时间中断处理，每隔固定的时间调用一次回调函数；还有一种是字节计数，例如设定字节计数为100，当MATLAB接收到100个串口数据字节（按标准串口通信，一个数据为8bit，实际通信位数为10bit，包括一位开始位，一位停止位）时，触发MATLAB串口回调函数。在本例中，我们使用字节计数模式，设置下位机定时发送数据，触发回调函数。让我们先来看看有哪些参数可以配置。</p>
+
+<p><div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style=";border-spacing:0;padding:0;margin:0;border:0;width:100%;overflow:auto;display:block;"><tr><td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-m" data-lang="m"><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">1</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">2</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">3</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">4</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">5</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">6</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">7</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">8</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">9</span></code></pre></td>
+<td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-m" data-lang="m">BaudRate：波特率 
 Parity：奇偶校验类型
 DataBits：数据位，一般为8，不用设置
 StopBits：停止位，一般为1，不用设置
@@ -59,9 +64,16 @@ TimerFcn ：定时回调函数
 TimerPeriod：定时周期
 BytesAvailableFcn：字节计数回调函数
 BytesAvailableFcnCount：字节计数 
-BytesAvailableFcnMode：一般设置为字节模式，即byte</code></pre></div><br />
-<p>大家只需要对这些参数进行一些初步了解就行，有些参数不需要配置，保持默认就好。现在我们一起来分析一下配置代码，激动人心的时刻，Let&rsquo;s Program！</p><br />
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-m" data-lang="m">s = serial(&#39;COM4&#39;);                             %创建串口对象s，设置s为&#34;COM4&#34;端口
+BytesAvailableFcnMode：一般设置为字节模式，即byte</code></pre></td></tr></table>
+</div>
+</div>
+<p>大家只需要对这些参数进行一些初步了解就行，有些参数不需要配置，保持默认就好。现在我们一起来分析一下配置代码，激动人心的时刻，Let&rsquo;s Program！</p></p>
+
+<p><div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style=";border-spacing:0;padding:0;margin:0;border:0;width:100%;overflow:auto;display:block;"><tr><td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-m" data-lang="m"><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">1</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">2</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">3</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">4</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">5</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">6</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">7</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">8</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">9</span></code></pre></td>
+<td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-m" data-lang="m">s = serial(&#39;COM4&#39;);                             %创建串口对象s，设置s为&#34;COM4&#34;端口
 s.BaudRate = 115200;                            %设置波特率为115200
 s.DataBits = 8;                                 %设置数据位数为8位
 s.StopBits = 1;                                 %设置停止位为1位
@@ -69,17 +81,31 @@ set(s,&#39;Parity&#39;, &#39;none&#39;,&#39;FlowControl&#39;,&#39;none&#39;);   
 s.ReadAsyncMode = &#39;continuous&#39;;                 %异步接收连续模式
 s.BytesAvailableFcnMode = &#39;byte&#39;;               %回调函数字节计数模式
 s.BytesAvailableFcnCount = 500;                 %每接收到500个字节触发回调函数
-s.BytesAvailableFcn = {@callback_16bit,H};      %回调函数句柄，以及相应波形显示通道句柄</code></pre></div><br />
-<p>你是不是期待着输入这段代码，运行后会发生点什么？你真天真，我的套路可是很深的，这几行代码输进去，别的不敢保证，报一两个错是至少的。为什么？因为你还没有定义回调函数和回调函数的传递参数~不要那么轻易相信我，我可能无时无刻不在给你下套，就算是百度到的东西，到手之后你也不一定能马上就跑出正确的结果，要想真正学会这些东西，你得思考，得学会动手自己编程尝试。现在让我们一步一步来，从配置串口到打开串口使用fwrite和fread函数读写数据开始。看完这一章之后，你自己都可以在MATLAB上写出自己的串口调试助手（very简陋版）~现在，我们先配置一个最基本的串口~</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-m" data-lang="m">s = serial(&#39;COM4&#39;);                             %创建串口对象s，设置s为&#34;COM4&#34;端口，可以通过设备管理器查找系统给设备分配的端口号，并在代码中做相应的更改
+s.BytesAvailableFcn = {@callback_16bit,H};      %回调函数句柄，以及相应波形显示通道句柄</code></pre></td></tr></table>
+</div>
+</div>
+<p>你是不是期待着输入这段代码，运行后会发生点什么？你真天真，我的套路可是很深的，这几行代码输进去，别的不敢保证，报一两个错是至少的。为什么？因为你还没有定义回调函数和回调函数的传递参数~不要那么轻易相信我，我可能无时无刻不在给你下套，就算是百度到的东西，到手之后你也不一定能马上就跑出正确的结果，要想真正学会这些东西，你得思考，得学会动手自己编程尝试。现在让我们一步一步来，从配置串口到打开串口使用fwrite和fread函数读写数据开始。看完这一章之后，你自己都可以在MATLAB上写出自己的串口调试助手（very简陋版）~现在，我们先配置一个最基本的串口~</p></p>
+
+<p><div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style=";border-spacing:0;padding:0;margin:0;border:0;width:100%;overflow:auto;display:block;"><tr><td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-m" data-lang="m"><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">1</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">2</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">3</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">4</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">5</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">6</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">7</span></code></pre></td>
+<td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-m" data-lang="m">s = serial(&#39;COM4&#39;);                             %创建串口对象s，设置s为&#34;COM4&#34;端口，可以通过设备管理器查找系统给设备分配的端口号，并在代码中做相应的更改
 s.BaudRate = 9600;                              %设置波特率为9600
 s.DataBits = 8;                                 %设置数据位数
 s.StopBits = 1;                                 %设置停止位
 set(s,&#39;Parity&#39;, &#39;none&#39;,&#39;FlowControl&#39;,&#39;none&#39;);   %无校验位，无流控制
 s.ReadAsyncMode = &#39;continuous&#39;;                 %异步接收模式为连续
-s.BytesAvailableFcnMode = &#39;byte&#39;;               %回调函数模式为字节</code></pre></div>
-<p>在运行上面的代码后，你会生成一个配置好的串口对象s，不知道什么叫对象的先去找个女(男)朋友吧~你要真的想知道的话就去百度面向对象的编程，总之你可以认为s是一个整体，这个整体有很多的属性，比如人的头发的颜色，就是这个人的一种属性，对象也有一些函数，比如我要你走到某个地方做20个俯卧撑然后做50个仰卧起坐然后站起来大声喊“我真帅！”，这一系列的动作类似对使用对象的函数，简单明了吧，不过如果你真的找到对象了，那还是得恭喜你了，据网文说，两个人相互喜欢彼此几乎是一种奇迹。好了，闲话少絮，我们还只是创建和配置了s这样一个对象，并没有将s与系统的硬件联系起来，也就是说我们还没有使用MATLAB打开串口，而只是生成了打开这个串口的配置信息，那么如何打开这样一个串口呢？我们会使用到以下代码~</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-m" data-lang="m">try
+s.BytesAvailableFcnMode = &#39;byte&#39;;               %回调函数模式为字节</code></pre></td></tr></table>
+</div>
+</div>
+<p>在运行上面的代码后，你会生成一个配置好的串口对象s，不知道什么叫对象的先去找个女(男)朋友吧~你要真的想知道的话就去百度面向对象的编程，总之你可以认为s是一个整体，这个整体有很多的属性，比如人的头发的颜色，就是这个人的一种属性，对象也有一些函数，比如我要你走到某个地方做20个俯卧撑然后做50个仰卧起坐然后站起来大声喊“我真帅！”，这一系列的动作类似对使用对象的函数，简单明了吧，不过如果你真的找到对象了，那还是得恭喜你了，据网文说，两个人相互喜欢彼此几乎是一种奇迹。好了，闲话少絮，我们还只是创建和配置了s这样一个对象，并没有将s与系统的硬件联系起来，也就是说我们还没有使用MATLAB打开串口，而只是生成了打开这个串口的配置信息，那么如何打开这样一个串口呢？我们会使用到以下代码~</p></p>
+
+<p><div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style=";border-spacing:0;padding:0;margin:0;border:0;width:100%;overflow:auto;display:block;"><tr><td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-m" data-lang="m"><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 1</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 2</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 3</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 4</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 5</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 6</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 7</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 8</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 9</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">10</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">11</span></code></pre></td>
+<td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-m" data-lang="m">try
 fopen(s);                               %打开串口
 catch err
     fclose(s);  
@@ -89,18 +115,32 @@ catch err
     close all;
     clc;
     fprintf(&#39;串口打开失败。\n&#39;);
-end</code></pre></div>
+end</code></pre></td></tr></table>
+</div>
+</div>
 <p>再来解释一下，这里我们使用到了try结构打开串口，是因为我们每次打开串口的时候未必是一帆风顺的，该串口可能不存在，也可能被其他程序占用了，这个时候打开串口就会报错，而对于错误情况我们就要有一个应对错误的机制，就是销毁赃物！我们首先调用fopen函数试图打开串口，然而尝试未果后，我们就果断的关闭这个串口s（fclose(s)），然后删掉它(delete(s))，把它扔到垃圾桶(clear s)，再清空犯案现场(clear all)，再关闭犯案现场，仿佛我们没有来过(close all)，最后再清空我们来过的痕迹(clc:清空命令行)，最后向上级汇报任务失败(fprintf(&lsquo;&hellip;&rsquo;))。一切的一切如同行云流水般自然（不要想跑偏了）。串口打开失败可能是你忘记插上下位机了，或者你打开了一个不存在的串口，也有可能你的下位机心里已经有了别的人（被其他进程占用），当然，还有一个最坑的情况，就像小姨子一样被黄鹤老板给拐跑了！这是MATLAB内部运行机制的问题，因为你之前可能打开串口后发生了一些错误，清空了s变量而没有关闭串口s，也就是本例的“COM4”，这个时候你要么把黄鹤老板抓回来——用相同的配置定义一次s，然后使用fclose关掉；要么直接果断点，抄了黄鹤老板的家（关闭MATLAB），把他原厂1000的2000的皮鞋统统只卖20块，全给充公（释放所有权）。嗯，大致是这个意思，我一般都是直接重启MATLAB，而且这种情况很常见，在新手操作的时候出现次数尤为可观。那么串口打开了，我们是不是需要给下位机写点什么，这里我给大家介绍两个函数~请看大屏幕</p><br />
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-m" data-lang="m">fwrite(s,inst,&#39;uint8&#39;);
-d = fread(s,[1 15],&#39;uint8&#39;);</code></pre></div>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style=";border-spacing:0;padding:0;margin:0;border:0;width:100%;overflow:auto;display:block;"><tr><td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-m" data-lang="m"><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">1</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">2</span></code></pre></td>
+<td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-m" data-lang="m">fwrite(s,inst,&#39;uint8&#39;);
+d = fread(s,[1 15],&#39;uint8&#39;);</code></pre></td></tr></table>
+</div>
+</div>
 <p>使用fwrite函数可将你想对下位机说的话全部说出来，首先第一个参数，你想对谁说，这里我们当然是想对我们亲爱的下位机兄弟畅谈了，果断写s，第二个参数，你想对你的下位机说什么，inst是一个我之前生成的行向量，里面有n个数据，我就想对我的亲爱的下位机兄弟说这些话，第三个参数，你说话的语言，你想用国语和下位机交流还是用英语和下位机交流，就取决于这个参数了,大家可以去查查第三个参数的类型，可以看看有哪些类型可选，我在这就絮叨了（其实我也忘了）。只需要配置好这三个参数，我们就可以给下位机说点什么了。这里不着急演示，我们先看看第二行，d = fread(&hellip;&hellip;)，通过这个函数，我们可以倾听我们的下位机兄弟说了什么，第一个参数，还是对象，第二个参数，选择你想听几句话，第三个参数，还是通信的格式标准。现在我可以为大家演示一下！</p>
 <div align="center"><img src="http://wx4.sinaimg.cn/large/a876926ely1flj31obx9cj20j60fnq6a.jpg" width="50%"></div>
 <p>欢迎大家来看我们的演示环境，一块价值5RMB的CH340土豪金串口模块！实在抱歉手头没有闲钱买开发板了，不过目前的演示使用这个模块，将它的RXD和TXD相接也能继续我们的演示，至于下一篇搭建示波器，没有开发板好像做不了，到时候我再想办法吧~~~~~~~~~~好的，照例让我们来看看演示代码和演示结果，在看结果之前先想想会得到一个什么样的结果，为什么？</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-m" data-lang="m">inst = [1 2 3 4 5];
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style=";border-spacing:0;padding:0;margin:0;border:0;width:100%;overflow:auto;display:block;"><tr><td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-m" data-lang="m"><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">1</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">2</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">3</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">4</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">5</span></code></pre></td>
+<td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-m" data-lang="m">inst = [1 2 3 4 5];
 fwrite(s,inst,&#39;uint8&#39;);
 pause(0.02);                    %让串口数据再飞一会
 d = fread(s,[1 5],&#39;uint8&#39;);
-disp(d);                        %将d变量输出到屏幕上</code></pre></div>
+disp(d);                        %将d变量输出到屏幕上</code></pre></td></tr></table>
+</div>
+</div>
 <div align="center"><img src="http://wx3.sinaimg.cn/large/a876926ely1flj3jtts6xj20gf0fiwg9.jpg" width="50%"></div><br />
 <p>为了让大家觉得我是真的做了，我给大家截个脚本框的图。大家猜好了么，我要公布答案了！往下看！<p/>
 <p></p>
