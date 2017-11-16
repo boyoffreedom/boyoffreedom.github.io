@@ -50,7 +50,7 @@
   <span class="post-date">Wed, Nov 15, 2017</span>
   <p>博客刚建立，确实很忙也很累啊！花了5天时间从连github page是什么都不知道，到最终建成了自己的博客页面，这段时间每天晚上2-3点钟才睡，调试博客页面，希望给我的博客增加一些新的功能，虽然采用第三方建站工具hugo生成html，自己也改了大部分html和css文件。页面大致建成之后又开始疯狂写博文来努力丰富博客的内容，也是希望我的博客能受大家的欢迎，能给大家解决实际问题，同时分享我的一些想法。到今天，我博客的第一个原创系列正式收工！是不是可以开个香槟庆祝一下。嗯，我希望能将这个博客一直运行下去，只要github没有被墙，我就会一直给大家带来更新，就算github被WALL了，我也愿意花钱买个服务器，自己做下去，希望我能一直坚持下去！一边学习，一边分享，希望得到大家的支持！好了，言归正传，我们今天就来攻坚串口示波器的最后一个部分——回调函数。</p>
 
-<p><p>在上一篇，我们学习了怎么使用MATLAB进行串口通信，在上上篇我们学习了怎么使用MATLAB进行数据的可视化，在这一篇，我们将做一件激动人心的大事，将这俩货通过回调函数给捆起来。首先再让我们回顾一下MATLAB的回调函数有哪几种，第一种，固定帧结束字，这个方法是最没营养的方法，因为这个方法MATLAB只允许一个固定的帧结束字，而且它还不厚道的给你限定了这个字必须是&rdquo;\n&rdquo;，这就真的很无语了！注定这个方法不被芸芸众生所接受，所以用的多的一般是时间溢出回调和字节计数溢出回调，在这里，我们使用字节计数溢出回调，当然，这个方法也有不厚道的地方，下位机如果一直不停的发送倒还好，如果下位机发送时间间隔很长，从几秒到几分钟，而且数据量很少的情况下，上位机接收到的数据不一定能达到字节计数溢出的数值，会导致数据无法实时更新，不过我还是打算使用字节计数溢出，因为我比较坏。剩下的时间溢出你们自己去慢慢试吧！来，先上一段只能看不能吃的代码。</p>
+<p>在上一篇，我们学习了怎么使用MATLAB进行串口通信，在上上篇我们学习了怎么使用MATLAB进行数据的可视化，在这一篇，我们将做一件激动人心的大事，将这俩货通过回调函数给捆起来。首先再让我们回顾一下MATLAB的回调函数有哪几种，第一种，固定帧结束字，这个方法是最没营养的方法，因为这个方法MATLAB只允许一个固定的帧结束字，而且它还不厚道的给你限定了这个字必须是"\n"，这就真的很无语了！注定这个方法不被芸芸众生所接受，所以用的多的一般是时间溢出回调和字节计数溢出回调，在这里，我们使用字节计数溢出回调，当然，这个方法也有不厚道的地方，下位机如果一直不停的发送倒还好，如果下位机发送时间间隔很长，从几秒到几分钟，而且数据量很少的情况下，上位机接收到的数据不一定能达到字节计数溢出的数值，会导致数据无法实时更新，不过我还是打算使用字节计数溢出，因为我比较坏。剩下的时间溢出你们自己去慢慢试吧！来，先上一段只能看不能吃的代码。</p>
 <div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
 <table style=";border-spacing:0;padding:0;margin:0;border:0;width:100%;overflow:auto;display:block;"><tr><td style=";vertical-align:top;padding:0;margin:0;border:0;">
 <pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-m" data-lang="m"><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">1</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">2</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">3</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">4</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">5</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">6</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">7</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">8</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">9</span></code></pre></td>
@@ -168,7 +168,7 @@ end</code></pre></td></tr></table>
 </div>
 </div>
 <p>是不是很简单，很符合简单之美，就三行代码，不包括end，就完成了数据读取。这个函数是根据回调函数的标准定义的，除了名字可以更改以外，第一个参数是固定的，产生回调函数的串口对象，第二个参数也是固定的，串口缓存的字节数，第三个参数相当于形参，我们在open_serial.m里定义的H就是这个形参的实参，是用于回调函数和主窗口之间关联的句柄，在回调函数中对这些句柄的内容进行更改，可以直接更改我们生成界面的波形内容。好了，串口示波器整体的基础已经讲完了，接下来就是定制化的东西了，比如说通信协议，数据类型，本着敬职敬责的优良品质，我还会不厌其烦的继续给你们讲下去，由于是定制内容，大家可以对代码进行任意修改，完成你们期望完成的任务。接下来请大家<a target="view_window" href="https://github.com/boyoffreedom/Matlab_Serial_Scope/blob/master/callback_16bit.m" style="color:white;border:20px;">【点击此处跳转】</a>到我的github回调函数文件，再根据我的讲解进行理解。</p>
-<p>大家配合注释食用应该能很快消化掉这块硬骨头，先给大家简单介绍下我们的一帧串口数据包的组成结构，为了区分前一帧数据包与后一帧数据包，光靠不停的发送有效的串口数据是不行的，因为串口通信也会存在通信错误或者串码，所以我使用了一个两字节的数据[0xff,0x5a]作为一帧数据的帧头，这里大家可以自行定义帧头，怎么定义有什么说道大家可以自己去研究。帧头之后是一个字节的功能帧，下位机通过这个功能帧告诉上位机这一帧发送的是有符号整型(0x5a)，还是无符号整型(0x5b)，上位机就通过这三个帧来定义接收数据位置和显示方式。接下来就是真正有用的数据字节了，由于8位数据位只能0~255或-127~128，精度太低，因此在该例中每个通道使用两个8位数据组成一个16位的数据，如果功能帧为0x5a的话，最高位为符号位，可显示数据精度范围为-32768~32767，如果功能帧为0x5b，则显示精度范围为0~65535，对大多数情况来说已经非常够用了，如果下位机数据超出这个范围，可以在下位机内部对数据进行一个类归一化处理，将数据限制在范围之内。完整帧格式位 [0xff 0x5a 0x5a CH0H CH0L &hellip; CH8H CH8L] 其中CH0H为0通道的高8位字节，CH0L位0通道的低8位字节，后同。</p>
+<p>大家配合注释食用应该能很快消化掉这块硬骨头，先给大家简单介绍下我们的一帧串口数据包的组成结构，为了区分前一帧数据包与后一帧数据包，光靠不停的发送有效的串口数据是不行的，因为串口通信也会存在通信错误或者串码，所以我使用了一个两字节的数据[0xff,0x5a]作为一帧数据的帧头，这里大家可以自行定义帧头，怎么定义有什么说道大家可以自己去研究。帧头之后是一个字节的功能帧，下位机通过这个功能帧告诉上位机这一帧发送的是有符号整型(0x5a)，还是无符号整型(0x5b)，上位机就通过这三个帧来定义接收数据位置和显示方式。接下来就是真正有用的数据字节了，由于8位数据位只能0~255或-127~128，精度太低，因此在该例中每个通道使用两个8位数据组成一个16位的数据，如果功能帧为0x5a的话，最高位为符号位，可显示数据精度范围为-32768~32767，如果功能帧为0x5b，则显示精度范围为0~65535，对大多数情况来说已经非常够用了，如果下位机数据超出这个范围，可以在下位机内部对数据进行一个类归一化处理，将数据限制在范围之内。完整帧格式位 [0xff 0x5a 0x5a CH0H CH0L ... CH8H CH8L] 其中CH0H为0通道的高8位字节，CH0L位0通道的低8位字节，后同。</p>
 <p>为什么不使用32位整型或者浮点型呢？动动脑子，如果使用32位，通信速度马上砍一半，16位数据9个通道只需要发21个字节，32位数据9个通道就需要发4x9+3=39个字节！实时性也砍了一半，而且低16位的数据也基本用不上，直接大笔一挥砍成16位，多安逸。没有结束帧，也没有CRC校验字，因为在这个对数据准确率要求不是很高的系统里，加这些玩意简直是浪费下位机的资源，而且只要下位机脑子没烧掉，数据基本上不会出错，至少我用了这么久还碰到过出错的情况。总结：用这套通信协议就可以把效率提到最高。那么这套通信在上位机里是怎么实现的呢，还是从我们的代码上来分析吧。这里我拿最难的16位有符号整型数据帧做讲解，16位无符号整型数据帧大家就可以自行琢磨了。</p>
 <div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
 <table style=";border-spacing:0;padding:0;margin:0;border:0;width:100%;overflow:auto;display:block;"><tr><td style=";vertical-align:top;padding:0;margin:0;border:0;">
@@ -199,7 +199,7 @@ end</code></pre></td></tr></table>
   end</code></pre></td></tr></table>
 </div>
 </div>
-<p>由于MATLAB不支持位运算，因此我们只能通过十进制数值计算来模拟位运算，比如16位最高位为1时，这个数据在MATLAB中的体现就是mat(i,1) &gt; 32768，因为1000_0000_0000_0000的十进制数值是32768，对于16位的负数，我们想要在表示成MATLAB中的负数，就需要对16位的数据取反加一后，再给它扣上一个负号，mat(i,1)=-(65536-mat(i,1));如果16位数值是正数就不进行特殊处理。将九个通道数据处理并按行叠加，就是整段代码的上半段想要做的事，合并完成之后，我们就需要将数据显示到窗口中，这里我还做了个小技巧处理，使用plot函数会将整个波形清空后再将新的波形绘制上去，在数据集非常庞大的时候，plot函数也成为了木桶效应的短板，举个我以前碰到的灵异事件，当时下位机不停的给上位机发送数据，直到我把下位机关机后，上位机波形仍然在更新。。。。原因就是plot函数跑得太慢，导致缓存区不停的积累积累，直到下位机关机，数据仍然没有清空，辛苦的搬运工还在不停的搬砖盖楼。我的解决策略是什么：每次刷新就刷新固定点数，这个点数由plot_length = 8000;定义，当前接收到的点数小于8000点时，直接放心大胆的通过set函数设置句柄的显示内容，当接收到的点数超过8000时，我们就只显示当前点到前8000个点，这样上位机也能反应过来。至于其他接收到的数据全都保存到m(9,n)中了，想调用8000点以前的数据可以直接对m这个变量操作就行。</p>
+<p>由于MATLAB不支持位运算，因此我们只能通过十进制数值计算来模拟位运算，比如16位最高位为1时，这个数据在MATLAB中的体现就是mat(i,1) > 32768，因为1000_0000_0000_0000的十进制数值是32768，对于16位的负数，我们想要在表示成MATLAB中的负数，就需要对16位的数据取反加一后，再给它扣上一个负号，mat(i,1)=-(65536-mat(i,1));如果16位数值是正数就不进行特殊处理。将九个通道数据处理并按行叠加，就是整段代码的上半段想要做的事，合并完成之后，我们就需要将数据显示到窗口中，这里我还做了个小技巧处理，使用plot函数会将整个波形清空后再将新的波形绘制上去，在数据集非常庞大的时候，plot函数也成为了木桶效应的短板，举个我以前碰到的灵异事件，当时下位机不停的给上位机发送数据，直到我把下位机关机后，上位机波形仍然在更新。。。。原因就是plot函数跑得太慢，导致缓存区不停的积累积累，直到下位机关机，数据仍然没有清空，辛苦的搬运工还在不停的搬砖盖楼。我的解决策略是什么：每次刷新就刷新固定点数，这个点数由plot_length = 8000;定义，当前接收到的点数小于8000点时，直接放心大胆的通过set函数设置句柄的显示内容，当接收到的点数超过8000时，我们就只显示当前点到前8000个点，这样上位机也能反应过来。至于其他接收到的数据全都保存到m(9,n)中了，想调用8000点以前的数据可以直接对m这个变量操作就行。</p>
 <p>用完后记得解除串口的占有哦！也就是关闭串口，清除使用痕迹！</p>
 <div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
 <table style=";border-spacing:0;padding:0;margin:0;border:0;width:100%;overflow:auto;display:block;"><tr><td style=";vertical-align:top;padding:0;margin:0;border:0;">
@@ -214,10 +214,12 @@ clc;</code></pre></td></tr></table>
 </div>
 </div>
 <p>最后给大家贴一张实际工程中从下位机传送回来的波形。</p>
-<div align="center"><img src="http://wx3.sinaimg.cn/large/a876926ely1flj9bqnhiyj21hc0u077x.jpg" width="80%"></div><br />
+<div align="center"><img src="http://wx3.sinaimg.cn/large/a876926ely1flj9bqnhiyj21hc0u077x.jpg" width="80%"></div>  
 <p>好了，这就是这一篇的全部内容了！希望大家在实际使用中能用上这个简易的示波器，加速你的工程调试进度！我们下期再见！</p>
-<div align="right" class="text_link"><a href="https://boyoffreedom.github.io/matlab/matlab-scop2/" style="color:white;border:3px;">上一篇:[原创]Matlab上位机示波器(中)</a></div>
-<div align="right" style="color:white;border:3px;">下一篇:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;无&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;</div></p>
+
+<div class="chapter_link">
+<div style="float:left;" class="text_link"><a href="https://boyoffreedom.github.io/matlab/matlab-scop2/" style="color:white;border:3px;">上一篇:[原创]Matlab上位机示波器(中)</a></div>
+<div style="float:right;" style="color:white;border:3px;">下一篇:&emsp;&emsp;无&emsp;&emsp;</div></div>
 </div>
 <h2></h2>
 <div class="Comments">

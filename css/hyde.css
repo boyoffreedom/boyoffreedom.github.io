@@ -52,27 +52,36 @@ background-size:cover;
     font-size: 20px;
   }
 }
+/*章节切换连接*/
+div.chapter_link
+{
+  padding-top: 3rem;
+  padding-left: 6rem;
+  padding-right: 6rem;
+  padding-bottom: 3rem;
+}
 
 div.transbox			/*透明属性*/
 {
 padding-top: 2rem;
 padding-left: 2rem;
 padding-right: 2rem;
+padding-bottom: 2rem;
 min-height: 40rem;
 background-color: #101010;
-border: 2px solid black;
+border: 0.1rem solid black;
 opacity:0.718;
 filter:alpha(opacity=71.8); /* For IE8 and earlier */
 }
 div.transbox p			/*透明属性的段落属性定义*/
 {
 font-family:仿宋;
-font-size:20px;
-text-indent:40px;
-padding: 5px 30px;
+font-size:1rem;
+text-indent:2rem;
+padding: 0.3rem 2rem;
 font-weight:bold;
 color: #b0b0b0;
-line-height:35px;
+line-height:1.8rem;
 }
 
 div.transbox h1			/*透明属性的段落属性定义*/
@@ -80,7 +89,7 @@ div.transbox h1			/*透明属性的段落属性定义*/
 font-family:仿宋;
 font-weight:bold;
 color: #b0b0b0;
-line-height:30px;
+line-height:2rem;
 }
 
 
