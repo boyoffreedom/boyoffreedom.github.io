@@ -76,7 +76,7 @@ filter:alpha(opacity=71.8); /* For IE8 and earlier */
 div.transbox p			/*透明属性的段落属性定义*/
 {
 font-family:仿宋;
-font-size:1rem;
+font-size:0.8rem;
 text-indent:2rem;
 padding: 0.3rem 2rem;
 font-weight:bold;
