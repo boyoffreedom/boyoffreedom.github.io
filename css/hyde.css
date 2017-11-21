@@ -76,12 +76,12 @@ filter:alpha(opacity=71.8); /* For IE8 and earlier */
 div.transbox p			/*透明属性的段落属性定义*/
 {
 font-family:仿宋;
-font-size:0.8rem;
+font-size:1rem;
 text-indent:2rem;
 padding: 0.3rem 2rem;
 font-weight:bold;
 color: #b0b0b0;
-line-height:1.8rem;
+line-height:2rem;
 }
 
 div.transbox h1			/*透明属性的段落属性定义*/

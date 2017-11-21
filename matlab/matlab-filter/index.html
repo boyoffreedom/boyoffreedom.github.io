@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="generator" content="Hugo 0.30.2" />
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title>[学习笔记]如何使用MATLAB设计滤波器？ &middot; 立羽博客</title>
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+  
+  <link rel="stylesheet" href="https://boyoffreedom.github.io/css/print.css" media="print">
+  <link rel="stylesheet" href="https://boyoffreedom.github.io/css/poole.css">
+  <link rel="stylesheet" href="https://boyoffreedom.github.io/css/syntax.css">
+  <link rel="stylesheet" href="https://boyoffreedom.github.io/css/hyde.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Abril+Fatface|PT+Sans:400,400i,700">
+  <meta name="baidu-site-verification" content="ULuEySAzyq" />
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="/favicon.png">
+
+  
+  <link href="" rel="alternate" type="application/rss+xml" title="立羽博客" />
+</head>
+
+  <body class=" ">
+  <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <a href="https://boyoffreedom.github.io/"><h1>立羽博客</h1></a>
+      <p class="lead">
+       寻梦方向  展翅翱翔 
+      </p>
+    </div>
+
+    <ul class="sidebar-nav">
+      <div class="text_link"><li><a href="https://boyoffreedom.github.io//post/about">博客简介</a> </li></div>
+      <div class="text_link"><li><a href="/matlab/" > MATLAB </a></li></div><div class="text_link"><li><a href="/python/" > Python </a></li></div>
+    </ul>
+  </div>
+  <p class="sidebar-cpright sidebar-btm">&copy; 2017. All rights reserved. </p>
+</div>
+
+    <div class="content container">
+    <div class="post transbox">
+  <h1>[学习笔记]如何使用MATLAB设计滤波器？</h1>
+  <span class="post-date">Tue, Nov 21, 2017</span>
+  <p>对于从事数字信号处理相关工作人员，学习滤波器是不可避免的，本篇博文将教你如何使用MATLAB的FDATOOL设计一个滤波器，并对其功能进行验证。</p>
+
+<p>在写这篇博文的时候，参考了<a target="view_window" style="color:white;border:20px;" href="http://blog.csdn.net/syrchina/article/details/9053047">【IIR数字滤波器实现（mantlab+C语言）】</a>和<a target="view_window" style="color:white;border:20px;" href="http://blog.csdn.net/liusandian/article/details/52332498">【教你如何使用matlab中的FDATOOL来设计滤波器】</a>你也可以理解为这一篇博文是两篇博文的综合与实现。那么首先我们先打开matlab，在命令行输入【fdatool】，你就能调用今天的主角滤波器设计工具，当然你也可以用类似buttap、buttord、butter这类函数生成滤波器，然后再通过freqz将零极点转换成差分系数再滤波。从函数名字上就能看得晕头转向，所以有工具为什么不用呢？输入fdatool后等待一小会，就会出现图形界面工具箱。<div align="center"><img src="http://wx2.sinaimg.cn/large/a876926ely1flq3uxk2xdj20lu0gedir.jpg" width="70%"></div></p>
+
+<p><p>整个工具箱界面非常清爽，你需要设计哪种类型的滤波器，滤波器的各类频率在哪设置一目了然。出于对大家负责，我还是稍微解释一下，界面主要分为两个部分，上半部分是滤波器设计完成后的一些信息，左边是滤波器的类型、阶数和稳定性，右边的图形可以选择显示滤波器的幅频特性和相频特性，第二行是用户可以自己设定的参数，最左边的一列可以选择滤波器的类型，中间两列设置滤波器的阶数与频率参数，最右边的那一列可以设置截止增益。我们以一个二阶巴特沃斯低通滤波器为例。设置你的采样频率和通带频率，在Filter Order框内选择Specify order然后输入2，设置好各类参数后点击Design Filter生成滤波器如下图所示：</p><div align="center"><img src="http://wx2.sinaimg.cn/large/a876926ely1flq4ozwttrj20lu0getc1.jpg" width="70%"></div>
+<p>这个时候你的滤波器已经设计好了，你可以通过点击工具栏的图标选择查看幅频特性、相频特性、冲击相应等等，觉得没有问题了，你就可以保存你的滤波器参数了，我们保存可以有很多很多的方式，你可以选择导出到workspace，导出到mat文件，导出到C header，甚至可以使用MATLAB为你生成HDL文件，用于FPGA实现数字滤波，不过效果怎么样就得大家亲自试一试了。不过光是使用fdatool导入到mat文件里就已经够麻烦的了。你可以选择导出数据的结构，我们一般使用的结构有两种，fdatool默认的fdatool默认的Seconed-Order Sections，这个结构导出的是二次分式结构，可以通过下列函数式转换成差分系数的形式然后通过filter函数对dataRaw进行滤波。</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style=";border-spacing:0;padding:0;margin:0;border:0;width:100%;overflow:auto;display:block;"><tr><td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-m" data-lang="m"><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">1</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">2</span></code></pre></td>
+<td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-m" data-lang="m">[b a]=SOS2tf(SOS,G);
+filter(b, a, dataRaw);</code></pre></td></tr></table>
+</div>
+</div>
+<p>我们还可以使用fdatool直接转换成b,a的系数数组，在fdatool菜单栏选择Edit-&gt;Convert to single Section，等待一小会，fdatool就将SOS结构转换成Single Section结构了，这时候我们可以通过File-&gt;Exports输出到你想要的地方。</p><div align="center"><img src="http://wx4.sinaimg.cn/large/a876926ely1flq57914baj20lh0gaq69.jpg" width="70%"></div>
+<p>接下来我们验证一下我们的滤波器是否正常工作，工作的效果怎么样。我选择将滤波器的参数以mat格式输出到指定文件夹，命名为mybutlow.mat</p>
+<div align="center"><img src="http://wx1.sinaimg.cn/large/a876926ely1flq5foo9aoj20lf0g20vz.jpg" width="70%"></div>
+<p>然后我们通过脚本来测试一下我们的滤波器效果怎么样。</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style=";border-spacing:0;padding:0;margin:0;border:0;width:100%;overflow:auto;display:block;"><tr><td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-m" data-lang="m"><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 1</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 2</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 3</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 4</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 5</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 6</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 7</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 8</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 9</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">10</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">11</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">12</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">13</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">14</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">15</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">16</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">17</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">18</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">19</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">20</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">21</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">22</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">23</span></code></pre></td>
+<td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-m" data-lang="m">clear all;
+close all;
+fs=10000;                       %采样频率
+t=0:1/fs:0.5;                   %时间
+f1=50;                          %有用信号频率
+f2=2000;                        %单一噪声频率
+%signal1=square(10*pi*t,50);    %50Hz方波测试信号
+signal1=sin(2*pi*f1*t);         %50Hz正弦测试信号
+signal2=sin(2*pi*f2*t);         %NHz正弦杂波信号
+noise = 0.2*rand(1,length(t));  %生成幅值为0.2的高斯噪声
+x=signal1 + signal2 + noise;    %叠加有效信号和噪声
+subb(1) = subplot(211);         %显示原始波形和噪声叠加波形
+plot(x);
+hold on;
+grid on;
+plot(signal1,&#39;r&#39;);
+
+load(&#39;mybutlow.mat&#39;);           %导入低通滤波器系数
+d = filter(a,b,x);              %使用filter函数对x滤波，结果给d
+subb(2) = subplot(212);         %显示滤波后波形
+plot(d);
+grid on;
+linkaxes(subb,&#39;x&#39;);</code></pre></td></tr></table>
+</div>
+</div>
+<p>运行以上代码，可以得到滤波后的波形，效果还是蛮不错的！如果创建脚本运行上述代码有问题的话，可能是你的mat文件没有和脚本文件处在同一个目录下，因此无法执行load函数。</p>
+<div align="center"><img src="http://wx3.sinaimg.cn/large/a876926ely1flq5ogz70ij218x0ojwm4.jpg" width="70%"></div></p>
+
+<div class="chapter_link">
+<div style="float:left;"  class="text_link"><a href="https://boyoffreedom.github.io/matlab/matlab-scop3/" style="color:white;border:3px;">上一篇 : [原创]Matlab上位机示波器(下)</a></div>
+<div style="float:right;" style="color:white;border:3px;">下一篇 : &emsp;&emsp;无&emsp;&emsp;</div></div>
+</div>
+<h2></h2>
+<div class="Comments">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js">
+var gitalk = new Gitalk({
+  clientID: 'd928202ff2dcbe7f3004',
+  clientSecret: '4a657731f38e76ad1013d8bfb3917278a9b69f2f',
+  repo: 'boyoffreedom.github.io',
+  owner: 'boyoffreedom',
+  admin: ['boyoffreedom'],
+})
+gitalk.render('gitalk-container')
+</script>
+</div>
+
+
+    </div>
+
+    
+  </body>
+</html>
