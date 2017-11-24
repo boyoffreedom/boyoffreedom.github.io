@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Cs on 立羽博客</title>
+    <link>https://boyoffreedom.github.io/c/</link>
+    <description>Recent content in Cs on 立羽博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 24 Nov 2017 11:25:08 +0800</lastBuildDate>
+    
+	<atom:link href="https://boyoffreedom.github.io/c/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>[学习笔记]IIR低通滤波器的C语言实现与测试</title>
+      <link>https://boyoffreedom.github.io/c/lp-filter/</link>
+      <pubDate>Fri, 24 Nov 2017 11:25:08 +0800</pubDate>
+      
+      <guid>https://boyoffreedom.github.io/c/lp-filter/</guid>
+      <description>&lt;p&gt;在之前的一篇博文里给大家介绍了如何使用MATLAB设计一个巴特沃斯数字低通滤波器，在这一篇博文中，我将使用C语言来实现这个低通滤波器。&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="generator" content="Hugo 0.30.2" />
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title>[学习笔记]IIR低通滤波器的C语言实现与测试 &middot; 立羽博客</title>
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+  <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
+  
+  <link rel="stylesheet" href="https://boyoffreedom.github.io/css/print.css" media="print">
+  <link rel="stylesheet" href="https://boyoffreedom.github.io/css/poole.css">
+  <link rel="stylesheet" href="https://boyoffreedom.github.io/css/syntax.css">
+  <link rel="stylesheet" href="https://boyoffreedom.github.io/css/hyde.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Abril+Fatface|PT+Sans:400,400i,700">
+  <meta name="baidu-site-verification" content="ULuEySAzyq" />
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="/favicon.png">
+
+  
+  <link href="" rel="alternate" type="application/rss+xml" title="立羽博客" />
+</head>
+
+  <body class=" ">
+  <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <a href="https://boyoffreedom.github.io/"><h1>立羽博客</h1></a>
+      <p class="lead">
+       寻梦方向  展翅翱翔 
+      </p>
+    </div>
+
+    <ul class="sidebar-nav">
+      <div class="text_link"><li><a href="https://boyoffreedom.github.io//post/about">博客简介</a> </li></div>
+      <div class="text_link"><li><a href="/c/" > C Language </a></li></div><div class="text_link"><li><a href="/matlab/" > MATLAB </a></li></div><div class="text_link"><li><a href="/python/" > Python </a></li></div>
+    </ul>
+  </div>
+  <p class="sidebar-cpright sidebar-btm">&copy; 2017. All rights reserved. </p>
+</div>
+
+    <div class="content container">
+    <div class="post transbox">
+  <h1>[学习笔记]IIR低通滤波器的C语言实现与测试</h1>
+  <span class="post-date">Fri, Nov 24, 2017</span>
+  <p>在之前的一篇博文里给大家介绍了如何使用MATLAB设计一个巴特沃斯数字低通滤波器，在这一篇博文中，我将使用C语言来实现这个低通滤波器。</p>
+
+<p>博主最近一个项目，需要使用DSP跑一个二阶数字低通滤波器，DSP当然不可能跑m语言了，因此花了点时间研究一下如何使用C语言写一个数字滤波器，以前在学习数字信号处理这门课的时候学习过滤波器的设计，但一直没有机会去在项目中使用，久而久之就忘的差不多了，所以这两天还花了点事件恶补了一下数字信号处理，访问了很多高手的博客，最终决定做一个学习笔记，方便以后用到的时候可以直接查自己的博客。项目还是以实用为主，所以就没有细究如何从理论推导实现一个二阶IIR滤波器，使用MATLAB的滤波器设计工具箱就行，如果还不了解如何使用MATLAB的FDATOOL设计低通滤波器的话，可以<a target="view_window" style="color:white;border:20px;" href="https://boyoffreedom.github.io/matlab/matlab-filter/">【点击这里查看】</a>
+。使用C语言实现MATLAB设计的滤波器实际上是使用C语言实现MATLAB中的filter函数。我们首先来看看IIR数字滤波器(关于FIR与IIR滤波器大家可以查找数字信号处理相关书籍学习)的标准结构和它的标准公式。<br />
+<div align="center"><img src="http://wx4.sinaimg.cn/large/a876926ely1flt3dbbc1xj20l20exjsj.jpg" width="40%"></div><br />
+<p>IIR数字滤波器是一类递归型的线性时不变因果系统，其差分方程可以写为：</p></p>
+
+<p>$$ a_0y(n)=\sum_{i=0}^{M}a_ix(n-i)+\sum_{i=1}^{N}b_iy(n-i)$$</p>
+
+<p>其Z变换之后的系统函数为：</p>
+
+<p>$$
+H(z)=\frac{Y(z)}{X(z)}=\frac{\sum_{i=0}^{M}a_iz^{-i}}{1-\sum_{i=1}^{N}b_iz^{-i}}=a_0\frac{\prod_{i=1}^{M}(1-c_iz^{-1})}{\prod_{i=1}^{N}(1-d_iz^{-1})}
+$$</p>
+
+<p>在使用C语言编写实时滤波的程序时，我们只需要知道它的差分方程就OK了。在这里需要注意，你可以在MATLAB的命令行中输入help filter查看filter的帮助文档。帮助文档内的公式中，a * y的系数都是负数，你可以理解为MATLAB把a中的符号取反了。我们使用MATLAB生成了系数a,b，因此我们还是按照MATLAB的规则来编写C语言的差分方程。</p>
+
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style=";border-spacing:0;padding:0;margin:0;border:0;width:100%;overflow:auto;display:block;"><tr><td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-m" data-lang="m"><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">1</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">2</span></code></pre></td>
+<td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-m" data-lang="m">a(1) * y(n) = b(1) * x(n) + b(2)* x(n-1) + ... + b(nb+1) * x(n-nb)
+                      - a(2) * y(n-1) - ... - a(na+1) * y(n-na)</code></pre></td></tr></table>
+</div>
+</div>
+
+<p>这里我们还是主要以I型滤波器结构为例，因为II型是多个2阶I型滤波器级联就行，在C语言里采用循环调用滤波函数就可以实现。首先我们将fdatool设计的滤波器导出为C Header文件。Targets->Generat C header...点击后弹出窗口，在窗口输入相应的变量名称与数据类型。点击Generate生成头文件，选择路径保存。</p>
+<div align="center"><img src="http://wx2.sinaimg.cn/large/a876926ely1flt4etlxvlj20lf0hlq64.jpg" width="70%"></div>
+<p>打开我们的head file，里面内容如下：</p>
+
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style=";border-spacing:0;padding:0;margin:0;border:0;width:100%;overflow:auto;display:block;"><tr><td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 1</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 2</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 3</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 4</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 5</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 6</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 7</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 8</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 9</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">10</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">11</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">12</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">13</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">14</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">15</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">16</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">17</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">18</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">19</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">20</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">21</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">22</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">23</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">24</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">25</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">26</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">27</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">28</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">29</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">30</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">31</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">32</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">33</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">34</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">35</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">36</span></code></pre></td>
+<td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">/*
+</span><span style="color:#75715e"> * Filter Coefficients (C Source) generated by the Filter Design and Analysis Tool
+</span><span style="color:#75715e"> * Generated by MATLAB(R) 9.1 and the Signal Processing Toolbox 7.3.
+</span><span style="color:#75715e"> * Generated on: 24-Nov-2017 13:51:40
+</span><span style="color:#75715e">*/</span>
+
+<span style="color:#75715e">/*
+</span><span style="color:#75715e"> * Discrete-Time IIR Filter (real)
+</span><span style="color:#75715e"> * -------------------------------
+</span><span style="color:#75715e"> * Filter Structure    : Direct-Form II
+</span><span style="color:#75715e"> * Numerator Length    : 3
+</span><span style="color:#75715e"> * Denominator Length  : 3
+</span><span style="color:#75715e"> * Stable              : Yes
+</span><span style="color:#75715e"> * Linear Phase        : No
+</span><span style="color:#75715e"> */</span>
+
+<span style="color:#75715e">/* General type conversion for MATLAB generated C-code  */</span>
+<span style="color:#75715e">#include</span> <span style="color:#75715e">&#34;tmwtypes.h&#34;</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span><span style="color:#75715e">/*
+</span><span style="color:#75715e"> * Expected path to tmwtypes.h
+</span><span style="color:#75715e"> * H:\Program Files\MATLAB\R2016b\extern\include\tmwtypes.h
+</span><span style="color:#75715e"> */</span>
+<span style="color:#75715e">/****
+</span><span style="color:#75715e"> * Warning - Filter coefficients were truncated to fit specified data type.  
+</span><span style="color:#75715e"> *   The resulting response may not match generated theoretical response.
+</span><span style="color:#75715e"> *   Use the Filter Design &amp; Analysis Tool to design accurate
+</span><span style="color:#75715e"> *   single-precision filter coefficients.
+</span><span style="color:#75715e"> ****/</span>
+<span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span> NL <span style="color:#f92672">=</span> <span style="color:#ae81ff">3</span>;
+<span style="color:#66d9ef">const</span> real32_T IIR_B[<span style="color:#ae81ff">3</span>] <span style="color:#f92672">=</span> {
+  <span style="color:#ae81ff">8.765554958e-05</span>,<span style="color:#ae81ff">0.0001753110992</span>,<span style="color:#ae81ff">8.765554958e-05</span>
+};
+<span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span> DL <span style="color:#f92672">=</span> <span style="color:#ae81ff">3</span>;
+<span style="color:#66d9ef">const</span> real32_T IIR_A[<span style="color:#ae81ff">3</span>] <span style="color:#f92672">=</span> {
+                <span style="color:#ae81ff">1</span>,   <span style="color:#f92672">-</span><span style="color:#ae81ff">1.973344207</span>,   <span style="color:#ae81ff">0.9736948609</span>
+};</code></pre></td></tr></table>
+</div>
+</div>
+
+<p>由于C语言中没有定义real32_T这样的数据类型，而这个数据类型实际上就是单精度浮点型float，因此我们将它全部替换掉。就保留IIR_A和IIR_B两个变量就行。是不是瞬间清爽了很多？</p>
+
+<p><div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style=";border-spacing:0;padding:0;margin:0;border:0;width:100%;overflow:auto;display:block;"><tr><td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">1</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">2</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">3</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">4</span></code></pre></td>
+<td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">float</span> IIR_B[<span style="color:#ae81ff">3</span>] <span style="color:#f92672">=</span> {
+  <span style="color:#ae81ff">8.765554958e-05</span>,<span style="color:#ae81ff">0.0001753110992</span>,<span style="color:#ae81ff">8.765554958e-05</span>};
+<span style="color:#66d9ef">const</span> <span style="color:#66d9ef">float</span> IIR_A[<span style="color:#ae81ff">3</span>] <span style="color:#f92672">=</span> {
+  <span style="color:#ae81ff">1</span>,   <span style="color:#f92672">-</span><span style="color:#ae81ff">1.973344207</span>,   <span style="color:#ae81ff">0.9736948609</span>};</code></pre></td></tr></table>
+</div>
+</div></p>
+
+<p>接下来定义我们的函数，首先明确函数需要哪些输入变量，滤波器的系数A和B至少是需要的吧，还有X和Y的序列，X的当前值，返回值当然就是浮点型的Y[n]值咯，为了方便，我们定义一个结构体吧，这个结构体有两个float型的数组，用于存放X和Y的序列值，数组的长度为滤波器的阶数，代码如下：</p>
+
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style=";border-spacing:0;padding:0;margin:0;border:0;width:100%;overflow:auto;display:block;"><tr><td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">1</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">2</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">3</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">4</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">5</span></code></pre></td>
+<td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#define FILTER_ORDER 2		</span><span style="color:#75715e">//滤波器阶数定义
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">struct</span> IIR_Filter_State{
+    <span style="color:#66d9ef">float</span> x[FILTER_ORDER<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>];
+    <span style="color:#66d9ef">float</span> y[FILTER_ORDER<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>];
+};</code></pre></td></tr></table>
+</div>
+</div>
+
+<p>然后研究滤波器的差分结构，编写我们的函数。</p>
+
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style=";border-spacing:0;padding:0;margin:0;border:0;width:100%;overflow:auto;display:block;"><tr><td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 1</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 2</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 3</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 4</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 5</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 6</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 7</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 8</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 9</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">10</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">11</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">12</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">13</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">14</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">15</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">16</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">17</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">18</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">19</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">20</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">21</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">22</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">23</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">24</span></code></pre></td>
+<td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">float</span> <span style="color:#a6e22e">iir_filter</span>(<span style="color:#66d9ef">struct</span> IIR_Filter_State<span style="color:#f92672">*</span> filter_state, <span style="color:#66d9ef">float</span><span style="color:#f92672">*</span> a, <span style="color:#66d9ef">float</span><span style="color:#f92672">*</span> b, <span style="color:#66d9ef">float</span> x_0)
+{
+	<span style="color:#66d9ef">int</span> i;
+	<span style="color:#66d9ef">float</span> tmp <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+     <span style="color:#75715e">//xy值更新
+</span><span style="color:#75715e"></span>	<span style="color:#66d9ef">for</span>(i <span style="color:#f92672">=</span> FILTER_ORDER; i <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span> ;i<span style="color:#f92672">--</span>)
+    {
+        filter_state<span style="color:#f92672">-&gt;</span>x[i] <span style="color:#f92672">=</span> filter_state<span style="color:#f92672">-&gt;</span>x[i<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>];
+        filter_state<span style="color:#f92672">-&gt;</span>y[i] <span style="color:#f92672">=</span> filter_state<span style="color:#f92672">-&gt;</span>y[i<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>];
+    }
+	filter_state<span style="color:#f92672">-&gt;</span>x[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">=</span> x_0;
+	<span style="color:#75715e">//计算输出滤波数值
+</span><span style="color:#75715e"></span>	<span style="color:#66d9ef">for</span>(i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;=</span> FILTER_ORDER;i<span style="color:#f92672">++</span>)
+    {
+        tmp <span style="color:#f92672">+=</span> (b[i]<span style="color:#f92672">*</span> filter_state<span style="color:#f92672">-&gt;</span>x[i]);
+    }
+    <span style="color:#66d9ef">for</span>(i <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>; i <span style="color:#f92672">&lt;=</span> FILTER_ORDER;i<span style="color:#f92672">++</span>)
+    {
+        tmp <span style="color:#f92672">-=</span> (a[i]<span style="color:#f92672">*</span> filter_state<span style="color:#f92672">-&gt;</span>y[i]);
+    }
+    tmp <span style="color:#f92672">/=</span> a[<span style="color:#ae81ff">0</span>];
+	filter_state<span style="color:#f92672">-&gt;</span>y[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">=</span> tmp;
+	<span style="color:#66d9ef">return</span> tmp;
+}</code></pre></td></tr></table>
+</div>
+</div>
+
+<p>接下来如何测试我们的滤波器呢，我们可以使用C语言的文件操作，将MATLAB生成的测试数据读取出来，然后将结果写到另一个文件里。注：可以使用MATLAB中的dlmwrite函数将单个变量导出到txt文件。首先来看看我们的M代码。</p>
+
+<p><div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style=";border-spacing:0;padding:0;margin:0;border:0;width:100%;overflow:auto;display:block;"><tr><td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-m" data-lang="m"><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">1</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">2</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">3</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">4</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">5</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">6</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">7</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">8</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">9</span></code></pre></td>
+<td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-m" data-lang="m">fs=10000;                       %采样频率
+t=0:1/fs:0.5;                   %时间
+f1=50;                          %有用信号频率
+f2=2000;                        %单一噪声频率
+signal1=sin(2*pi*f1*t);         %50Hz正弦测试信号
+signal2=sin(2*pi*f2*t);         %NHz正弦杂波信号
+noise = 0.2*rand(1,length(t));  %生成幅值为0.2的高斯噪声
+x=signal1 + signal2 + noise;    %叠加有效信号和噪声
+dlmwrite(&#39;lowpass_input.txt&#39;,x,&#39;delimiter&#39;, &#39; &#39;); %导出到lowpass_input.txt文件</code></pre></td></tr></table>
+</div>
+</div></p>
+
+<p>运行这段代码后可以看到MATLAB当前目录下多出了一个lowpass_input.txt文件，这里面的数据就是x的数据。然后将这个文件复制到C项目目录下（可以将.m文件放在C项目目录下运行，就不需要copy lowpass_input.txt文件了）。接下来运行以下主函数。</p>
+
+<p><div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style=";border-spacing:0;padding:0;margin:0;border:0;width:100%;overflow:auto;display:block;"><tr><td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 1</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 2</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 3</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 4</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 5</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 6</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 7</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 8</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 9</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">10</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">11</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">12</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">13</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">14</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">15</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">16</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">17</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">18</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">19</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">20</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">21</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">22</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">23</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">24</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">25</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">26</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">27</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">28</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">29</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">30</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">31</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">32</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">33</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">34</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">35</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">36</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">37</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">38</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">39</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">40</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">41</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">42</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">43</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">44</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">45</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">46</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">47</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">48</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">49</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">50</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">51</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">52</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">53</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">54</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">55</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">56</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">57</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">58</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">59</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">60</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">61</span></code></pre></td>
+<td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#define LENGTH 5001
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>()
+{
+    FILE <span style="color:#f92672">*</span>data,<span style="color:#f92672">*</span>dout;       <span style="color:#75715e">/***文件指针***/</span>
+    <span style="color:#66d9ef">int</span> i;
+    <span style="color:#66d9ef">float</span> in_data[LENGTH],filter_out[LENGTH];
+    <span style="color:#66d9ef">struct</span> IIR_Filter_State state1;
+    <span style="color:#66d9ef">if</span>((data <span style="color:#f92672">=</span> fopen(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;lowpass_input.txt&#34;</span>,<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;r&#34;</span>)) <span style="color:#f92672">==</span> NULL)         <span style="color:#75715e">//打开测试数据文件
+</span><span style="color:#75715e"></span>    {
+        printf(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;lowpass_input.txt file does not exist!</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);     <span style="color:#75715e">//文件打开失败
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span>((data <span style="color:#f92672">=</span> fopen(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;lowpass_input.txt&#34;</span>,<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;w+&#34;</span>)) <span style="color:#f92672">==</span> NULL)    <span style="color:#75715e">//生成测试数据文件
+</span><span style="color:#75715e"></span>        {
+            printf(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;cannot create file lowpass_input.txt!</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);  <span style="color:#75715e">//数据文件生成失败，退出
+</span><span style="color:#75715e"></span>            getchar();
+        }
+        <span style="color:#66d9ef">else</span>                                                    <span style="color:#75715e">//文件打开成功
+</span><span style="color:#75715e"></span>        {
+            fclose(data);
+            getchar();
+        }
+        <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+    }
+    <span style="color:#66d9ef">if</span>((dout <span style="color:#f92672">=</span> fopen(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;lowpass_out.txt&#34;</span>,<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;w+&#34;</span>))<span style="color:#f92672">==</span>NULL)
+    {
+        printf(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;Cannot open lowpass_out.txt!</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
+        fclose(dout);
+        <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+    }
+
+                                                                <span style="color:#75715e">//读取数据
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">for</span>(i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> LENGTH;i<span style="color:#f92672">++</span>)
+    {
+        fscanf(data,<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;%f &#34;</span>,<span style="color:#f92672">&amp;</span>in_data[i]);
+    }
+    printf(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;Data read success!</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
+    <span style="color:#75715e">//滤波进行时
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">//初始化低通滤波器状态结构体
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">for</span>(i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> FILTER_ORDER<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>;i<span style="color:#f92672">++</span>)
+    {
+        state1.x[i] <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+        state1.y[i] <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+    }
+    <span style="color:#75715e">//iir滤波函数
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">for</span>(i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> LENGTH;i<span style="color:#f92672">++</span>)
+    {
+        filter_out[i] <span style="color:#f92672">=</span> iir_filter(<span style="color:#f92672">&amp;</span>state1,IIR_A,IIR_B,in_data[i]);
+    }
+    printf(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;Lowpass Filter compute finish!</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
+    <span style="color:#75715e">//保存滤波结果
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">for</span>(i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> LENGTH;i<span style="color:#f92672">++</span>)
+    {
+        fprintf(dout,<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;%f &#34;</span>,filter_out[i]);
+    }
+    printf(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;Save finish!</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
+                                                                <span style="color:#75715e">//保存滤波结果
+</span><span style="color:#75715e"></span>                                                                <span style="color:#75715e">//关闭文件
+</span><span style="color:#75715e"></span>    fclose(data);
+    fclose(dout);
+    <span style="color:#75715e">//getchar();
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}</code></pre></td></tr></table>
+</div>
+</div>
+<p>Copy代码时记得包含你的滤波器头文件哦！运行结束后，C项目目录下会生成一个lowpass_out.txt文件，这个文件里存放的是滤波后的Y数组。将文件copy到MATLAB当前目录下，运行以下代码查看输出后的波形：</p></p>
+
+<p><div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style=";border-spacing:0;padding:0;margin:0;border:0;width:100%;overflow:auto;display:block;"><tr><td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-m" data-lang="m"><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">1</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">2</span></code></pre></td>
+<td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-m" data-lang="m">C_read = dlmread(&#39;lowpass_out.txt&#39;);
+plot(C_read);</code></pre></td></tr></table>
+</div>
+</div></p>
+
+<div align="center"><img src="http://wx4.sinaimg.cn/large/a876926ely1flt5n22mrrj21890oigqg.jpg" width="70%"></div>
+<p>结果还是蛮不错的嘛。详细代码已经上传到我的repo<a target="view_window" style="color:white;border:20px;" href="https://github.com/boyoffreedom/Matlab_Filter_2_C">【点击这里查看】</a>。好的，希望这篇博文能够帮到你！有问题可以通过博客简介的联系方式联系我！</p>
+
+<div class="chapter_link">
+<div style="float:left;"  style="color:white;border:3px;">上一篇 :  &emsp;&emsp;无&emsp;&emsp;</div>
+<div style="float:right;" style="color:white;border:3px;">下一篇 : &emsp;&emsp;无&emsp;&emsp;</div></div>
+</div>
+<h2></h2>
+<div class="Comments">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js">
+var gitalk = new Gitalk({
+  clientID: 'd928202ff2dcbe7f3004',
+  clientSecret: '4a657731f38e76ad1013d8bfb3917278a9b69f2f',
+  repo: 'boyoffreedom.github.io',
+  owner: 'boyoffreedom',
+  admin: ['boyoffreedom'],
+})
+gitalk.render('gitalk-container')
+</script>
+</div>
+
+
+    </div>
+
+    
+  </body>
+</html>
