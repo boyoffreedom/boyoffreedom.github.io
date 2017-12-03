@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="generator" content="Hugo 0.30.2" />
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title>基于OpenCV的颜色识别（上） &middot; 立羽博客</title>
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+  <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
+  
+  <link rel="stylesheet" href="https://boyoffreedom.github.io/css/print.css" media="print">
+  <link rel="stylesheet" href="https://boyoffreedom.github.io/css/poole.css">
+  <link rel="stylesheet" href="https://boyoffreedom.github.io/css/syntax.css">
+  <link rel="stylesheet" href="https://boyoffreedom.github.io/css/hyde.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Abril+Fatface|PT+Sans:400,400i,700">
+  <meta name="baidu-site-verification" content="ULuEySAzyq" />
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="/favicon.png">
+
+  
+  <link href="" rel="alternate" type="application/rss+xml" title="立羽博客" />
+</head>
+
+  <body class=" ">
+  <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <a href="https://boyoffreedom.github.io/"><h1>立羽博客</h1></a>
+      <p class="lead">
+       寻梦方向  展翅翱翔 
+      </p>
+    </div>
+
+    <ul class="sidebar-nav">
+      <div class="text_link"><li><a href="https://boyoffreedom.github.io//post/about">博客简介</a> </li></div>
+      <div class="text_link"><li><a href="/c/" > C Language </a></li></div><div class="text_link"><li><a href="/matlab/" > MATLAB </a></li></div><div class="text_link"><li><a href="/python/" > Python </a></li></div>
+    </ul>
+  </div>
+  <p class="sidebar-cpright sidebar-btm">&copy; 2017. All rights reserved. </p>
+</div>
+
+    <div class="content container">
+    <div class="post transbox">
+  <h1>基于OpenCV的颜色识别（上）</h1>
+  <span class="post-date">Sun, Dec 3, 2017</span>
+  <p>这篇博文将教大家如何使用python的opencv库进行颜色识别。OpenCV是一个开源计算机视觉库，这个库为我们提供了很多用于图形处理的函数，OpenCV组织为C++、JAVA、Python等主流编程语言提供了接口，也方便我们使用Python调用OpenCV库进行图像处理，甚至结合TensorFlow可以做图像识别的预处理。</p>
+
+<p>我是在大四学年参加一个机器人比赛接触到OpenCV的，我们团队当时使用的机器人是法国公司生产的Nao机器人，这家公司为Nao开发了许多集成开发环境，使得用户可以调用API对机器人进行控制（实际上也只能调用API，底层未开源，但是可以移植第三方开源库）。我当时在团队中承担视觉处理工作，这部分使用Nao提供的API无法达到比赛识别的要求，所以借这个机会跳进了OpenCV的坑。</p>  
+<h2>安装OpenCV库</h2>
+<p>首先还是来教大家怎么安装python的opencv和相应的依赖库，如果大家将python的目录添加到环境变量里（windows用户安装python的时候可以选择将python加入环境变量），同时按下windows+R键调出运行窗口，输入cmd进入命令行，在命令行中按下方命令使用pip安装即可。如果没有接触过python语言但是想学的，建议大家直接上python3，python2官方在2020年左右将停止维护，如果不幸，你的电脑上共同存在着两个版本的python而且不凑巧，他俩都进入了你系统的环境变量，那就将命令行的pip改成pip3进行安装吧。</p>  
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style=";border-spacing:0;padding:0;margin:0;border:0;width:100%;overflow:auto;display:block;"><tr><td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">1</span></code></pre></td>
+<td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">pip install opencv_python  </code></pre></td></tr></table>
+</div>
+</div>
+
+<p>Linux用户一般都是大神，应该不需要我说怎么安装了，不过出于保险起见，我还是把安装命令打出来吧。</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style=";border-spacing:0;padding:0;margin:0;border:0;width:100%;overflow:auto;display:block;"><tr><td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">1</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">2</span></code></pre></td>
+<td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">sudo apt<span style="color:#f92672">-</span>get install pip3
+pip3 install opencv_python</code></pre></td></tr></table>
+</div>
+</div>
+<p>安装完成后，进入python，在命令行输入import cv2，然后回车，如果没有报错的话，恭喜你，你安装成功了。我们来试试使用OpenCV显示一张图片吧。新建py文件，输入以下代码，注意确保py文件的目录下有01.jpg文件。</p>  
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style=";border-spacing:0;padding:0;margin:0;border:0;width:100%;overflow:auto;display:block;"><tr><td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">1</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">2</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">3</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">4</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">5</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">6</span></code></pre></td>
+<td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> cv2  
+
+img <span style="color:#f92672">=</span> cv2<span style="color:#f92672">.</span>imread(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;01.jpg&#34;</span>)  
+cv2<span style="color:#f92672">.</span>imshow(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;Image&#34;</span>, img)  
+cv2<span style="color:#f92672">.</span>waitKey(<span style="color:#ae81ff">0</span>)  
+cv2<span style="color:#f92672">.</span>destroyAllWindows()  </code></pre></td></tr></table>
+</div>
+</div>  
+<h2>颜色空间</h2>
+<p>颜色空间也称彩色模型，不同的颜色空间适用于不同的应用场景。生活中最常见的就是RGB颜色空间，这种颜色空间在彩色图像采集设备和以及彩色显示器等硬件设备中具有明显的优势。而HIS、HSV颜色空间更加符合计算机图象处理的要求。RGB彩色模型是根据红、绿、蓝三基色原理设计的，顾名思义，这个彩色空间中的每个像素的颜色由红、绿、蓝三种颜色的深度表示。</p>
+<div align="center"><img src="http://wx3.sinaimg.cn/large/a876926ely1fm41bwlrapj207b058mx4.jpg" width="30%"></div>
+<p>在计算机颜色识别中，HSV颜色空间更具有优势。HSV(Hue, Saturation, Value)颜色空间中H对应色调，S对应饱和度，V对应明度，是根据颜色的直观特性创建的一种面向视觉感知的颜色模型，它对应于圆柱坐标系中的一个圆锥形子集的模型。</p>
+<div align="center"><img src="http://wx3.sinaimg.cn/large/a876926ely1fm41bu38yuj206q07idfz.jpg" width="20%"></div>
+<p>在OpenCV库中，我们可以不用管REG与HSV颜色空间相互转换的关系式，直接使用OpenCV为你封装好的转换函数即可对图像进行颜色空间的变换。cv2.cvtColor(input_image, flag) 函数就是提供给用户对图片进行颜色空间变换的函数，该函数第一个输入参数是图片的指针，第二个输入参数选择对图像进行何种色空间转换的，该函数支持150种色空间的转换，最常用的是RGB↔Gray和RGB↔HSV之间的相互转换，在颜色识别与提取中，常用RGB↔HSV色空间转换。在OpenCV中，HSV色调H的范围是[0,179]，饱和度S的范围是[0,255]，明度V的范围是[0,255]，而在不同的视觉库中，这些取值范围是有差异的，因此在使用其他视觉库进行处理时，必须注意取值范围，避免错误。</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style=";border-spacing:0;padding:0;margin:0;border:0;width:100%;overflow:auto;display:block;"><tr><td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 1</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 2</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 3</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 4</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 5</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 6</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 7</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 8</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 9</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">10</span></code></pre></td>
+<td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> cv2  
+
+img <span style="color:#f92672">=</span> cv2<span style="color:#f92672">.</span>imread(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;image.jpg&#39;</span>)
+hsv <span style="color:#f92672">=</span> cv2<span style="color:#f92672">.</span>cvtColor(img,cv2<span style="color:#f92672">.</span>COLOR_BGR2HSV)
+cv2<span style="color:#f92672">.</span>imshow(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;image&#39;</span>,hsv)
+<span style="color:#66d9ef">while</span>(<span style="color:#ae81ff">1</span>):
+      k <span style="color:#f92672">=</span> cv2<span style="color:#f92672">.</span>waitKey(<span style="color:#ae81ff">5</span>) <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0xFF</span>
+      <span style="color:#66d9ef">if</span> k <span style="color:#f92672">==</span> <span style="color:#ae81ff">27</span>:
+            <span style="color:#66d9ef">break</span>
+cv2<span style="color:#f92672">.</span>destroyAllWindows()  </code></pre></td></tr></table>
+</div>
+</div>
+<div align="center"><img src="http://wx3.sinaimg.cn/large/a876926ely1fm41bvz7vsj20zk0qo7ep.jpg" width="60%"></div>
+<div align="center"><img src="http://wx2.sinaimg.cn/large/a876926ely1fm41bva9wnj20zk0qo183.jpg" width="60%"></div>
+<p>输入以上代码，就可以看到HSV空间中的图像了，不过这个图像从显示上来看并没有多大的意义，因为显示的图片是将转换后的HSV颜色空间通过RGB颜色空间的方式显示出来，H值对应B的值，S值对应G的值，V值对应R的值。将颜色空间转换成方便计算机识别的HSV颜色空间后，我们就可以开始我们的颜色提取部分了，在此以绿色为例，我们首先需要确定绿色的HSV颜色范围，这个大家可以上网查一下对照表，但对照表也只是一个参考，大家可以根据实际场地的亮度、饱和度和色调进行实际调整。在这张图片中，我选取绿色的范围为[50,50,46]~[90,255,255]。我们可以使用cv2.inRange函数在hsv图片中搜索在这个范围内的像素点，该函数会返回一个原图像尺寸的掩膜，我们调用cv2.bitwise_and()函数将掩膜覆盖在原始图像上，就可以查看我们所提取的颜色效果图了。对了，提示没有安装numpy的孩子们可以使用pip安装numpy，这是一个python的科学运算库，可以使用numpy进行矩阵运算，这个库在机器学习中也用的比较多。</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style=";border-spacing:0;padding:0;margin:0;border:0;width:100%;overflow:auto;display:block;"><tr><td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 1</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 2</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 3</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 4</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 5</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 6</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 7</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 8</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 9</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">10</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">11</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">12</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">13</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">14</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">15</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">16</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">17</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">18</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">19</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">20</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">21</span></code></pre></td>
+<td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> cv2  
+<span style="color:#f92672">import</span> numpy <span style="color:#f92672">as</span> np
+
+img <span style="color:#f92672">=</span> cv2<span style="color:#f92672">.</span>imread(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;image.jpg&#39;</span>)
+hsv <span style="color:#f92672">=</span> cv2<span style="color:#f92672">.</span>cvtColor(img,cv2<span style="color:#f92672">.</span>COLOR_BGR2HSV)
+
+lower_green <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>array([<span style="color:#ae81ff">50</span>,<span style="color:#ae81ff">50</span>,<span style="color:#ae81ff">46</span>])
+upper_green <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>array([<span style="color:#ae81ff">90</span>,<span style="color:#ae81ff">255</span>,<span style="color:#ae81ff">255</span>])
+mask_green <span style="color:#f92672">=</span> cv2<span style="color:#f92672">.</span>inRange(hsv, lower_green, upper_green)
+res_green <span style="color:#f92672">=</span> cv2<span style="color:#f92672">.</span>bitwise_and(img,img, mask<span style="color:#f92672">=</span> mask_green)
+
+
+cv2<span style="color:#f92672">.</span>imshow(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;image&#39;</span>,hsv)
+cv2<span style="color:#f92672">.</span>imshow(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;res_green&#39;</span>,res_green)
+cv2<span style="color:#f92672">.</span>imwrite(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;img_hsv.jpg&#39;</span>,hsv)
+cv2<span style="color:#f92672">.</span>imwrite(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;img_green.jpg&#39;</span>,res_green)
+<span style="color:#66d9ef">while</span>(<span style="color:#ae81ff">1</span>):
+      k <span style="color:#f92672">=</span> cv2<span style="color:#f92672">.</span>waitKey(<span style="color:#ae81ff">5</span>) <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0xFF</span>
+      <span style="color:#66d9ef">if</span> k <span style="color:#f92672">==</span> <span style="color:#ae81ff">27</span>:
+            <span style="color:#66d9ef">break</span>
+cv2<span style="color:#f92672">.</span>destroyAllWindows()  </code></pre></td></tr></table>
+</div>
+</div>
+<div align="center"><img src="http://wx3.sinaimg.cn/large/a876926ely1fm41buox8bj20zk0qowm6.jpg" width="60%"></div>
+<p>好了，入门篇就讲到这里，在下一篇我们将学习数字图像处理的形态学变换。最后贴一下我当初学习OpenCV时<a target="view_window" href="https://github.com/boyoffreedom/opencv_color_recognition" style="color:white;border:4px;">【写过的代码】</a>希望能帮助大家！</p>
+
+<div class="chapter_link">
+<div style="color:white;border:3px;float:left;">上一篇 : &emsp;&emsp;无&emsp;&emsp;</div>
+<div style="color:white;border:3px;float:right;">下一篇 : 基于OpenCV的颜色识别（中）</div>
+</div>
+</div>
+<h2></h2>
+<div class="Comments">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js">
+var gitalk = new Gitalk({
+  clientID: 'd928202ff2dcbe7f3004',
+  clientSecret: '4a657731f38e76ad1013d8bfb3917278a9b69f2f',
+  repo: 'boyoffreedom.github.io',
+  owner: 'boyoffreedom',
+  admin: ['boyoffreedom'],
+})
+gitalk.render('gitalk-container')
+</script>
+</div>
+
+
+    </div>
+
+    
+  </body>
+</html>
