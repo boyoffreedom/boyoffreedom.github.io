@@ -6,13 +6,22 @@
     <description>Recent content on 立羽博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 03 Dec 2017 22:48:26 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 09 Dec 2017 22:53:53 +0800</lastBuildDate>
     
 	<atom:link href="https://boyoffreedom.github.io/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>基于OpenCV的颜色识别（上）</title>
+      <title>[原创]基于OpenCV的颜色识别（中）</title>
+      <link>https://boyoffreedom.github.io/python/color_recognition1/</link>
+      <pubDate>Sat, 09 Dec 2017 22:53:53 +0800</pubDate>
+      
+      <guid>https://boyoffreedom.github.io/python/color_recognition1/</guid>
+      <description>&lt;p&gt;上一篇博文为大家讲解了如何使用颜色空间变换提取预设范围的颜色，这一篇博文将为大家讲解一些图像处理中经常用到的形态学变换。我们用的最多的形态学变换一般为膨胀、腐蚀、开、闭四种运算，根据应用场景灵活的选择形态学变换能够帮助你更好的通过颜色实现物体识别。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>[原创]基于OpenCV的颜色识别（上）</title>
       <link>https://boyoffreedom.github.io/python/color_recognition/</link>
       <pubDate>Sun, 03 Dec 2017 22:48:26 +0800</pubDate>
       
@@ -54,15 +63,6 @@
       
       <guid>https://boyoffreedom.github.io/matlab/matlab-scop2/</guid>
       <description>&lt;p&gt;在上一篇博文我们谈到了怎么使用MATLAB的plot与subplot函数进行多个图形的同窗口显示，我们的示波器最基本的图形界面框架就可以使用figure、plot与subplot函数构成，因为追求使用，最大限度的放弃了GUI编程，而这几个函数也很完美的满足了我们整个系统的需求。对于plot函数其实还可以在同一个窗口的同一张图片上绘制不同的曲线，只需要将n个m长度的行向量叠加成一个nxm的矩阵，plot函数将自动将你的矩阵内的每行向量穿上不同颜色的衣服再给推向屏幕。这不是本章重点，还请大家自己在MATLAB的命令行或脚本内自行编写调试。在这一章中主要给大家介绍一下怎么使用MATLAB调用串口资源。&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>[原创]基于pygame的打字练习游戏</title>
-      <link>https://boyoffreedom.github.io/python/typegame/</link>
-      <pubDate>Tue, 14 Nov 2017 12:34:27 +0800</pubDate>
-      
-      <guid>https://boyoffreedom.github.io/python/typegame/</guid>
-      <description>&lt;p&gt;基于pygame的打字练习游戏&lt;/p&gt;</description>
     </item>
     
     <item>

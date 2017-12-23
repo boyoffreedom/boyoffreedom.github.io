@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 
-  <title>基于OpenCV的颜色识别（上） &middot; 立羽博客</title>
+  <title>[原创]基于OpenCV的颜色识别（上） &middot; 立羽博客</title>
   <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
   <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
   <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
@@ -38,6 +38,7 @@
     </div>
 
     <ul class="sidebar-nav">
+      <div class="text_link"><li><a target="view_window" href="https://github.com/boyoffreedom">我的GitHub</a> </li></div>
       <div class="text_link"><li><a href="https://boyoffreedom.github.io//post/about">博客简介</a> </li></div>
       <div class="text_link"><li><a href="/c/" > C Language </a></li></div><div class="text_link"><li><a href="/matlab/" > MATLAB </a></li></div><div class="text_link"><li><a href="/python/" > Python </a></li></div>
     </ul>
@@ -47,7 +48,7 @@
 
     <div class="content container">
     <div class="post transbox">
-  <h1>基于OpenCV的颜色识别（上）</h1>
+  <h1>[原创]基于OpenCV的颜色识别（上）</h1>
   <span class="post-date">Sun, Dec 3, 2017</span>
   <p>这篇博文将教大家如何使用python的opencv库进行颜色识别。OpenCV是一个开源计算机视觉库，这个库为我们提供了很多用于图形处理的函数，OpenCV组织为C++、JAVA、Python等主流编程语言提供了接口，也方便我们使用Python调用OpenCV库进行图像处理，甚至结合TensorFlow可以做图像识别的预处理。</p>
 
@@ -108,10 +109,10 @@ cv2<span style="color:#f92672">.</span>destroyAllWindows()  </code></pre></td></
 </div>
 <div align="center"><img src="http://wx3.sinaimg.cn/large/a876926ely1fm41bvz7vsj20zk0qo7ep.jpg" width="60%"></div>
 <div align="center"><img src="http://wx2.sinaimg.cn/large/a876926ely1fm41bva9wnj20zk0qo183.jpg" width="60%"></div>
-<p>输入以上代码，就可以看到HSV空间中的图像了，不过这个图像从显示上来看并没有多大的意义，因为显示的图片是将转换后的HSV颜色空间通过RGB颜色空间的方式显示出来，H值对应B的值，S值对应G的值，V值对应R的值。将颜色空间转换成方便计算机识别的HSV颜色空间后，我们就可以开始我们的颜色提取部分了，在此以绿色为例，我们首先需要确定绿色的HSV颜色范围，这个大家可以上网查一下对照表，但对照表也只是一个参考，大家可以根据实际场地的亮度、饱和度和色调进行实际调整。在这张图片中，我选取绿色的范围为[50,50,46]~[90,255,255]。我们可以使用cv2.inRange函数在hsv图片中搜索在这个范围内的像素点，该函数会返回一个原图像尺寸的掩膜，我们调用cv2.bitwise_and()函数将掩膜覆盖在原始图像上，就可以查看我们所提取的颜色效果图了。对了，提示没有安装numpy的孩子们可以使用pip安装numpy，这是一个python的科学运算库，可以使用numpy进行矩阵运算，这个库在机器学习中也用的比较多。</p>
+<p>输入以上代码，就可以看到HSV空间中的图像了，不过这个图像从显示上来看并没有多大的意义，因为显示的图片是将转换后的HSV颜色空间通过RGB颜色空间的方式显示出来，H值对应B的值，S值对应G的值，V值对应R的值。将颜色空间转换成方便计算机识别的HSV颜色空间后，我们就可以开始我们的颜色提取部分了，在此以绿色为例，我们首先需要确定绿色的HSV颜色范围，这个大家可以上网查一下对照表，但对照表也只是一个参考，大家可以根据实际场地的亮度、饱和度和色调进行实际调整。在这张图片中，我选取绿色的范围为[50,50,46]~[90,255,255]。我们可以使用cv2.inRange函数在hsv图片中搜索在这个范围内的像素点，该函数会返回一个原图像尺寸的掩膜，我们调用cv2.bitwise_and()函数将掩膜覆盖在原始图像上，就可以查看我们所提取的颜色效果图了，不过在实际图像处理中，我们一般用的比较多的还是直接对某种颜色的掩膜进行操作，比如形态学变换、轮廓查找等。PS：如果提示没有安装numpy的孩子们可以使用pip安装numpy，这是一个python的科学运算库，可以使用numpy进行矩阵运算，这个库在机器学习中也用的比较多。</p>
 <div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
 <table style=";border-spacing:0;padding:0;margin:0;border:0;width:100%;overflow:auto;display:block;"><tr><td style=";vertical-align:top;padding:0;margin:0;border:0;">
-<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 1</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 2</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 3</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 4</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 5</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 6</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 7</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 8</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 9</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">10</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">11</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">12</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">13</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">14</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">15</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">16</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">17</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">18</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">19</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">20</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">21</span></code></pre></td>
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 1</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 2</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 3</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 4</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 5</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 6</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 7</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 8</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 9</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">10</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">11</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">12</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">13</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">14</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">15</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">16</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">17</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">18</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">19</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">20</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">21</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">22</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">23</span></code></pre></td>
 <td style=";vertical-align:top;padding:0;margin:0;border:0;">
 <pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> cv2  
 <span style="color:#f92672">import</span> numpy <span style="color:#f92672">as</span> np
@@ -127,6 +128,8 @@ res_green <span style="color:#f92672">=</span> cv2<span style="color:#f92672">.<
 
 cv2<span style="color:#f92672">.</span>imshow(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;image&#39;</span>,hsv)
 cv2<span style="color:#f92672">.</span>imshow(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;res_green&#39;</span>,res_green)
+cv2<span style="color:#f92672">.</span>imshow(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;mask_green&#39;</span>,mask_green)
+cv2<span style="color:#f92672">.</span>imwrite(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;mask_green.jpg&#39;</span>,mask_green)
 cv2<span style="color:#f92672">.</span>imwrite(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;img_hsv.jpg&#39;</span>,hsv)
 cv2<span style="color:#f92672">.</span>imwrite(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;img_green.jpg&#39;</span>,res_green)
 <span style="color:#66d9ef">while</span>(<span style="color:#ae81ff">1</span>):
@@ -136,12 +139,15 @@ cv2<span style="color:#f92672">.</span>imwrite(<span style="color:#e6db74"></spa
 cv2<span style="color:#f92672">.</span>destroyAllWindows()  </code></pre></td></tr></table>
 </div>
 </div>
+<p>掩膜图：</p>
+<div align="center"><img src="http://wx2.sinaimg.cn/large/a876926egy1fmaywvi42bj20zk0qon31.jpg" width="60%"></div>
+<p>参考图：</p>
 <div align="center"><img src="http://wx3.sinaimg.cn/large/a876926ely1fm41buox8bj20zk0qowm6.jpg" width="60%"></div>
 <p>好了，入门篇就讲到这里，在下一篇我们将学习数字图像处理的形态学变换。最后贴一下我当初学习OpenCV时<a target="view_window" href="https://github.com/boyoffreedom/opencv_color_recognition" style="color:white;border:4px;">【写过的代码】</a>希望能帮助大家！</p>
 
 <div class="chapter_link">
 <div style="color:white;border:3px;float:left;">上一篇 : &emsp;&emsp;无&emsp;&emsp;</div>
-<div style="color:white;border:3px;float:right;">下一篇 : 基于OpenCV的颜色识别（中）</div>
+<div style="float:right;" class="text_link"><a href="http://www.undefinedalan.top/python/color_recognition1/" style="color:white;border:3px;">下一篇 : [原创]基于OpenCV的颜色识别（中）</div>
 </div>
 </div>
 <h2></h2>

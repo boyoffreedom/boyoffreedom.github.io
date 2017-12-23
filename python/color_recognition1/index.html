@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="generator" content="Hugo 0.30.2" />
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title>[原创]基于OpenCV的颜色识别（中） &middot; 立羽博客</title>
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+  <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
+  
+  <link rel="stylesheet" href="https://boyoffreedom.github.io/css/print.css" media="print">
+  <link rel="stylesheet" href="https://boyoffreedom.github.io/css/poole.css">
+  <link rel="stylesheet" href="https://boyoffreedom.github.io/css/syntax.css">
+  <link rel="stylesheet" href="https://boyoffreedom.github.io/css/hyde.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Abril+Fatface|PT+Sans:400,400i,700">
+  <meta name="baidu-site-verification" content="ULuEySAzyq" />
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="/favicon.png">
+
+  
+  <link href="" rel="alternate" type="application/rss+xml" title="立羽博客" />
+</head>
+
+  <body class=" ">
+  <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <a href="https://boyoffreedom.github.io/"><h1>立羽博客</h1></a>
+      <p class="lead">
+       寻梦方向  展翅翱翔 
+      </p>
+    </div>
+
+    <ul class="sidebar-nav">
+      <div class="text_link"><li><a target="view_window" href="https://github.com/boyoffreedom">我的GitHub</a> </li></div>
+      <div class="text_link"><li><a href="https://boyoffreedom.github.io//post/about">博客简介</a> </li></div>
+      <div class="text_link"><li><a href="/c/" > C Language </a></li></div><div class="text_link"><li><a href="/matlab/" > MATLAB </a></li></div><div class="text_link"><li><a href="/python/" > Python </a></li></div>
+    </ul>
+  </div>
+  <p class="sidebar-cpright sidebar-btm">&copy; 2017. All rights reserved. </p>
+</div>
+
+    <div class="content container">
+    <div class="post transbox">
+  <h1>[原创]基于OpenCV的颜色识别（中）</h1>
+  <span class="post-date">Sat, Dec 9, 2017</span>
+  <p>上一篇博文为大家讲解了如何使用颜色空间变换提取预设范围的颜色，这一篇博文将为大家讲解一些图像处理中经常用到的形态学变换。我们用的最多的形态学变换一般为膨胀、腐蚀、开、闭四种运算，根据应用场景灵活的选择形态学变换能够帮助你更好的通过颜色实现物体识别。</p>
+
+<p><h2>提问：什么是形态学变换？</h2>
+<p>数学形态学（也称图像代数）表示以形态为基础对图像进行分析的数学工具，数学形态学在图像处理中的主要应用包括：边缘检测、图像分割、形态骨架提取、噪声滤除。形态学变换是一系列基于图像外形的简单运算，通常在二值化的图像上进行（上一篇所述的颜色提取模板图为二值化图像），形态学变换一般需要两个输入，一个是二值化图像，另一个被称为结构元素，结构元素决定了运算的性质，一般是一个n阶方阵，其中n的大小可以根据需要设定。最基础的形态学变换有两种，膨胀与腐蚀。</p>
+<p>膨胀，就是将二值化图像的白色（1）像素向黑色（0）像素区域进行扩展。用结构元素扫描图像的每一个像素，将结构元素与其覆盖的而至图像做“与”操作，如果得到一个全0结果，则变换后的图像上该像素点为0，否则为1。使用膨胀操作可以滤除图像白色区域内部的黑色噪点，但也会在一定程度上扩宽白色区域轮廓的范围，同时黑色背景中的细小白色噪点也向外扩大连通，形成了面积更大的亮点。因此在复杂的图像处理中仅仅使用膨胀运算并不能得到理想的结果。</p>
+<div align="center"><img src="http://wx2.sinaimg.cn/large/a876926egy1fmaz9o04kfj20zk0qojtu.jpg" width="60%"></div>
+<p>腐蚀运算将图像中的黑色（0）像素区域向白色（1）像素区域挤压，减小白色（1）像素区域的面积。具体运算步骤为，用结构元素扫描图像的每一个像素，将结构元素与其覆盖的而至图像做“与”操作，如果得到一个全1结果，则变换后的图像上该像素点为1，否则为0。使用腐蚀运算可以将黑色区域的白色噪点滤除。腐蚀可以减少环境产生的白色噪点，但提取目标内部的黑色噪点仍然存在，同时目标的区域面积也因为腐蚀运算而缩小。</p>
+<div align="center"><img src="http://wx4.sinaimg.cn/large/a876926egy1fmaz9ojchqj20zk0qon37.jpg" width="60%"></div>
+<h2>提问：膨胀和腐蚀各有各自的优点，但都鱼和熊掌不可得兼，有没有更好的算法综合二者的优点？</h2>
+<p>当然是有的！膨胀和腐蚀只是形态学变换中的最基础的变换，在膨胀和腐蚀的基础上自然还有其他更加高级的，更加复杂的形态学变换算法，比如说开、闭两种运算就针对膨胀与腐蚀两种运算保留了各自的特征，同时又保留了目标本身的轮廓面积特性。他们是怎么做到的呢？其实道理很简单。闭运算对图像先膨胀再腐蚀，对图像的膨胀运算去除了白色区域内部的黑色噪点，但是扩宽了图像内白色区域的轮廓，这个时候用膨胀运算的结构元素再进行一次腐蚀运算，就能将白色区域轮廓大致还原到运算前的大小，同时还清除了轮廓内的噪点。而开运算则与闭运算相反，它对图像先腐蚀再膨胀，该运算首先通过腐蚀运算将黑色区域的白色噪点滤除，再通过同一结构元素进行膨胀运算将白色外轮廓扩充。闭运算效果图如下：</p>
+<div align="center"><img src="http://wx2.sinaimg.cn/large/a876926egy1fmaz9nh26uj20zk0qodhv.jpg" width="60%"></div>
+<p>而开运算与闭运算的顺序正好相反，开运算对图像先腐蚀后膨胀，运算效果图如下：</p>
+<div align="center"><img src="http://wx4.sinaimg.cn/large/a876926egy1fmaz9p3sj1j20zk0qo0xd.jpg" width="60%"></div></p>
+
+<p><p>除了这几种基本的形态学变换之外，还有许多的高级形态学变换和滤波方法，根据不同的应用场景选择不同的图像形态学变换算法会达到意想不到的效果。多尝试，选择合适的算法吧！最后贴上Python代码！</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">
+<table style=";border-spacing:0;padding:0;margin:0;border:0;width:100%;overflow:auto;display:block;"><tr><td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 1</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 2</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 3</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 4</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 5</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 6</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 7</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 8</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;"> 9</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">10</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">11</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">12</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">13</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">14</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">15</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">16</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">17</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">18</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">19</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">20</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">21</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">22</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">23</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">24</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">25</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">26</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">27</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">28</span><span style="color:#7c7c79;margin-right:0.4em;padding:00.4em00.4em;display:block;">29</span></code></pre></td>
+<td style=";vertical-align:top;padding:0;margin:0;border:0;">
+<pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> cv2  
+<span style="color:#f92672">import</span> numpy <span style="color:#f92672">as</span> np
+
+img <span style="color:#f92672">=</span> cv2<span style="color:#f92672">.</span>imread(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;image.jpg&#39;</span>)
+hsv <span style="color:#f92672">=</span> cv2<span style="color:#f92672">.</span>cvtColor(img,cv2<span style="color:#f92672">.</span>COLOR_BGR2HSV)
+
+lower_green <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>array([<span style="color:#ae81ff">50</span>,<span style="color:#ae81ff">50</span>,<span style="color:#ae81ff">46</span>])
+upper_green <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>array([<span style="color:#ae81ff">90</span>,<span style="color:#ae81ff">255</span>,<span style="color:#ae81ff">255</span>])
+mask_green <span style="color:#f92672">=</span> cv2<span style="color:#f92672">.</span>inRange(hsv, lower_green, upper_green)
+res_green <span style="color:#f92672">=</span> cv2<span style="color:#f92672">.</span>bitwise_and(img,img, mask<span style="color:#f92672">=</span> mask_green)
+
+
+kernel <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>ones((<span style="color:#ae81ff">5</span>,<span style="color:#ae81ff">5</span>),np<span style="color:#f92672">.</span>uint8)
+erosion <span style="color:#f92672">=</span> cv2<span style="color:#f92672">.</span>erode(mask_green,kernel,iterations <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>)           <span style="color:#75715e">#腐蚀运算</span>
+dilation <span style="color:#f92672">=</span> cv2<span style="color:#f92672">.</span>dilate(mask_green,kernel,iterations <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>)         <span style="color:#75715e">#膨胀运算</span>
+open_green <span style="color:#f92672">=</span> cv2<span style="color:#f92672">.</span>morphologyEx(mask_green,cv2<span style="color:#f92672">.</span>MORPH_OPEN,kernel) <span style="color:#75715e">#开运算</span>
+close_green <span style="color:#f92672">=</span> cv2<span style="color:#f92672">.</span>morphologyEx(mask_green,cv2<span style="color:#f92672">.</span>MORPH_CLOSE,kernel) <span style="color:#75715e">#闭运算</span>
+
+<span style="color:#75715e">#写入效果图</span>
+cv2<span style="color:#f92672">.</span>imwrite(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;erosion.jpg&#39;</span>,erosion)
+cv2<span style="color:#f92672">.</span>imwrite(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;dilation.jpg&#39;</span>,dilation)
+cv2<span style="color:#f92672">.</span>imwrite(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;open_green.jpg&#39;</span>,open_green)
+cv2<span style="color:#f92672">.</span>imwrite(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;close_green.jpg&#39;</span>,close_green)
+
+<span style="color:#66d9ef">while</span>(<span style="color:#ae81ff">1</span>):
+      k <span style="color:#f92672">=</span> cv2<span style="color:#f92672">.</span>waitKey(<span style="color:#ae81ff">5</span>) <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0xFF</span>
+      <span style="color:#66d9ef">if</span> k <span style="color:#f92672">==</span> <span style="color:#ae81ff">27</span>:
+            <span style="color:#66d9ef">break</span>
+cv2<span style="color:#f92672">.</span>destroyAllWindows()  </code></pre></td></tr></table>
+</div>
+</div>
+<div class="chapter_link">
+<div style="float:left;"  class="text_link"><a href="http://www.undefinedalan.top/python/color_recognition/"  style="color:white;border:3px;">上一篇 : [原创]基于OpenCV的颜色识别（上）</div>
+<div style="float:right;" class="text_link"><a href="http://www.undefinedalan.top/python/color_recognition2/" style="color:white;border:3px;">下一篇 : [原创]基于OpenCV的颜色识别（下）</div>
+</div></p>
+</div>
+<h2></h2>
+<div class="Comments">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js">
+var gitalk = new Gitalk({
+  clientID: 'd928202ff2dcbe7f3004',
+  clientSecret: '4a657731f38e76ad1013d8bfb3917278a9b69f2f',
+  repo: 'boyoffreedom.github.io',
+  owner: 'boyoffreedom',
+  admin: ['boyoffreedom'],
+})
+gitalk.render('gitalk-container')
+</script>
+</div>
+
+
+    </div>
+
+    
+  </body>
+</html>
